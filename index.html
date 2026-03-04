@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Open Card Sorting Tool</title>
+<style>
+body { font-family: Avenir, sans-serif; margin: 100px; }
+h1 { margin-bottom: 10px; }
+.board { display: flex; gap: 20px; flex-wrap: wrap; }
+.category {
+  background: #f4f4f4;
+  padding: 10px;
+  width: 220px;
+  height: 220px;          /* hauteur fixe */
+  border-radius: 8px;
+  overflow-y: auto;       /* scroll interne */
+  display: flex;
+  flex-direction: column;
+}
+.category h3 { margin: 0 0 10px 0; cursor: text; }
+.card { background: white; padding: 8px; margin-bottom: 8px; border-radius: 5px; cursor: grab; border: 1px solid #ddd; }
+.card:active { cursor: grabbing; }
+button {
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  margin-right: 10px;
+}
+button:hover { background-color: #0069d8; }
+#submit-btn {
+  background-color: #28a745;
+  margin-top: 20px;
+}
+</style>
+</head>
+<body>
+
+<h1>Activité de tri de cartes</h1>
+<button id="add-category-btn">Ajoutez une catégorie</button>
+<button id="add-card-btn">Ajoutez une carte</button>
+<div class="board" id="board"></div>
+
+<script>
+let draggedCard = null;
+
+// Predefined categories and cards
+const categories = ["Cartes à trier","À propos","Actualités","Organismes partenaires", "Contact", "Fonctionnement"];
+const initialCards = [
+    "Calendrier des récoltes", 
+    "Participer à une cueillette", 
+    "Calendrier des cueillettes", 
+    "Instructions pour les bénévoles", 
+    "Fonctionnement d'une cueillette", 
+    "Inscrire mon arbre", 
+    "Conditions de participation",
+    "FAQ",
+    "Mission",
+    "Notre impact",
+    "Répartition des fruits",
+    "Valeurs du collectif",
+    "Inscription à l'infolettre",
+    "Évènements",
+    "Réseaux sociaux",
+    "Contact",
+    "Courriel",
+    "Notre équipe",
+    "Devenir chef de cueillette",
+    "Guide d'entretien des arbres",
+    "Guide de récolte des fruits",
+    "Faire un don",
+];
+
+// Keep references to categories for adding cards
+const categoryMap = {};
+
+document.addEventListener("DOMContentLoaded", () => {
+  const board = document.getElementById("board");
+
+  // Create initial categories
+  categories.forEach(name => addCategory(name));
+
+  // Add cards to "Unsorted"
+  initialCards.forEach(text => {
+    const card = createCard(text);
+    categoryMap["Cartes à trier"].appendChild(card);
+  });
+
+  // Button listeners
+  document.getElementById("add-category-btn").addEventListener("click", () => {
+    addCategory("Nouvelle catégorie");
+  });
+
+  document.getElementById("add-card-btn").addEventListener("click", () => {
+    const cardName = prompt("Nom de la nouvelle carte :");
+    if(cardName && cardName.trim() !== "") {
+      const card = createCard(cardName.trim());
+      categoryMap["Cartes à trier"].appendChild(card);
+    }
+  });
+});
+
+function addCategory(name) {
+  const board = document.getElementById("board");
+
+  const category = document.createElement("div");
+  category.className = "category";
+
+  category.addEventListener("dragover", e => e.preventDefault());
+  category.addEventListener("drop", () => {
+    if (draggedCard) category.appendChild(draggedCard);
+  });
+
+  const title = document.createElement("h3");
+  title.textContent = name;
+  title.contentEditable = true;
+  category.appendChild(title);
+
+  board.appendChild(category);
+
+  // Save reference for adding cards
+  categoryMap[name] = category;
+}
+
+function createCard(text) {
+  const card = document.createElement("div");
+  card.className = "card";
+  card.textContent = text;
+  card.draggable = true;
+
+  card.addEventListener("dragstart", () => {
+    draggedCard = card;
+    setTimeout(() => card.style.display = "none", 0);
+  });
+
+  card.addEventListener("dragend", () => {
+    draggedCard = null;
+    card.style.display = "block";
+  });
+
+  return card;
+}
+</script>
+<button id="submit-btn">Soumettre</button>
+</body>
+</html>
