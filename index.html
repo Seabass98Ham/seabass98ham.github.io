@@ -215,15 +215,12 @@ function createCard(text, isDeletable = false) {
  function confirmSubmit() {
     if (confirm("Êtes-vous sûr de vouloir soumettre votre tri?")) {
 
-        fetch("https://script.google.com/macros/s/AKfycby3yxKl7WI2yipKdpU0aaq__YNubQ70Nd1rmoRDASCvcqUIfnMr8Px1luVsZqjm8J-Y/exec", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                value: "test"
-            })
+        fetch("https://script.google.com/macros/s/AKfycbxgQYOrfgW_NA1CkgSbxqoyQM5tEXzm76UsohVWAFDbU4Oc2hCtjVyxoYivwtCQH9PM/exec", {
+          method: "POST",
+          redirect: "follow",
+          body: JSON.stringify({ value: "test" })
         })
+          
         .then(res => res.json())
         .then(data => {
             alert("Merci pour votre participation! Votre tri a été envoyé avec succès.");
