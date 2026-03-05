@@ -221,7 +221,7 @@ function createCard(text, isDeletable = false) {
           body: JSON.stringify({ value: "test" })
         })
           
-        .then(res => res.json())
+        .then(res => res.text())
         .then(data => {
             alert("Merci pour votre participation! Votre tri a été envoyé avec succès.");
             location.reload();
