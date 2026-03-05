@@ -143,6 +143,40 @@ function createCard(text) {
 
   return card;
 }
+  function collectData() {
+  const results = {};
+
+  document.querySelectorAll(".category").forEach(category => {
+    const title = category.querySelector("h3").textContent;
+    const cards = [];
+
+    category.querySelectorAll(".card").forEach(card => {
+      cards.push(card.textContent);
+    });
+
+    results[title] = cards;
+  });
+
+  return results;
+}
+
+  document.getElementById("submit-btn").addEventListener("click", () => {
+    const data = collectData();
+  
+    fetch("COLLE_ICI_TON_URL_APPS_SCRIPT", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+      alert("Merci ! Vos réponses ont été enregistrées.");
+    })
+    .catch(error => {
+      alert("Erreur lors de l'envoi.");
+      console.error(error);
+    });
+  });
 </script>
 <button id="submit-btn">Soumettre</button>
 </body>
