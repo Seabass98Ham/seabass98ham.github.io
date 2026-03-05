@@ -215,12 +215,19 @@ function createCard(text, isDeletable = false) {
  function confirmSubmit() {
     if (confirm("Êtes-vous sûr de vouloir soumettre votre tri?")) {
 
+        // Collect all categories and their cards
+        const result = {};
+        document.querySelectorAll(".category").forEach(category => {
+            const categoryName = category.querySelector("h3").textContent.trim();
+            const cards = [...category.querySelectorAll(".card-label")].map(c => c.textContent.trim());
+            result[categoryName] = cards;
+        });
+
         fetch("https://script.google.com/macros/s/AKfycbxgQYOrfgW_NA1CkgSbxqoyQM5tEXzm76UsohVWAFDbU4Oc2hCtjVyxoYivwtCQH9PM/exec", {
-          method: "POST",
-          redirect: "follow",
-          body: JSON.stringify({ value: "test" })
+            method: "POST",
+            redirect: "follow",
+            body: JSON.stringify(result)
         })
-          
         .then(res => res.text())
         .then(data => {
             alert("Merci pour votre participation! Votre tri a été envoyé avec succès.");
@@ -230,7 +237,6 @@ function createCard(text, isDeletable = false) {
             console.error(err);
             alert("Erreur lors de l'envoi.");
         });
-
     }
 }
 </script>
