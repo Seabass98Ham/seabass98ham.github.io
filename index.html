@@ -11,15 +11,35 @@ h1 { margin-bottom: 10px; }
   background: #f4f4f4;
   padding: 10px;
   width: 220px;
-  height: 220px;          /* hauteur fixe */
+  height: 220px;
   border-radius: 8px;
-  overflow-y: auto;       /* scroll interne */
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
 }
-.category h3 { margin: 0 0 10px 0; cursor: text; }
-.card { background: white; padding: 8px; margin-bottom: 8px; border-radius: 5px; cursor: grab; border: 1px solid #ddd; }
+.category-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 0 10px 0;
+}
+.category h3 { margin: 0; cursor: text; flex: 1; font-size: 16px;}
+.delete-btn {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0 5px 0 6px;
+  margin: 0;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.delete-btn:hover { color: #e53935; background: none; }
+.card { background: white; padding: 8px; margin-bottom: 8px; border-radius: 5px; cursor: grab; border: 1px solid #ddd; display: flex; align-items: center; justify-content: space-between; font-size: 14px;}
 .card:active { cursor: grabbing; }
+.card-label { flex: 1; }
+.card .delete-btn { font-size: 12px; padding: 0 0 0 6px; }
 button {
   background-color: #007BFF;
   color: white;
@@ -43,14 +63,13 @@ button:hover { background-color: #0069d8; }
 <body>
 
 <h1>Activité de tri de cartes</h1>
-<button id="add-category-btn">Ajoutez une catégorie</button>
 <button id="add-card-btn">Ajoutez une carte</button>
+<button id="add-category-btn">Ajoutez une catégorie</button>
 <div class="board" id="board"></div>
 
 <script>
 let draggedCard = null;
 
-// Predefined categories and cards
 const categories = ["Cartes à trier", "S'impliquer", "À propos","Actualités","Organismes partenaires", "Contact", "Fonctionnement"];
 const initialCards = [
     "Calendrier des récoltes", 
@@ -77,36 +96,32 @@ const initialCards = [
     "Faire un don",
 ];
 
-// Keep references to categories for adding cards
 const categoryMap = {};
 
 document.addEventListener("DOMContentLoaded", () => {
   const board = document.getElementById("board");
 
-  // Create initial categories
-  categories.forEach(name => addCategory(name));
+  categories.forEach(name => addCategory(name, false));
 
-  // Add cards to "Unsorted"
   initialCards.forEach(text => {
     const card = createCard(text);
     categoryMap["Cartes à trier"].appendChild(card);
   });
 
-  // Button listeners
   document.getElementById("add-category-btn").addEventListener("click", () => {
-    addCategory("Nouvelle catégorie");
+    addCategory("Nouvelle catégorie", true);
   });
 
   document.getElementById("add-card-btn").addEventListener("click", () => {
     const cardName = prompt("Nom de la nouvelle carte :");
     if(cardName && cardName.trim() !== "") {
-      const card = createCard(cardName.trim());
+      const card = createCard(cardName.trim(), true);
       categoryMap["Cartes à trier"].appendChild(card);
     }
   });
 });
 
-function addCategory(name) {
+function addCategory(name, isDeletable) {
   const board = document.getElementById("board");
 
   const category = document.createElement("div");
@@ -117,22 +132,58 @@ function addCategory(name) {
     if (draggedCard) category.appendChild(draggedCard);
   });
 
+  // Header wrapper
+  const header = document.createElement("div");
+  header.className = "category-header";
+
   const title = document.createElement("h3");
   title.textContent = name;
   title.contentEditable = true;
-  category.appendChild(title);
+  header.appendChild(title);
 
+  // Only add delete button for user-created categories
+  if (isDeletable) {
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "delete-btn";
+    deleteBtn.textContent = "✕";
+    deleteBtn.title = "Supprimer cette catégorie";
+    deleteBtn.addEventListener("click", () => {
+      // Move any cards back to "Cartes à trier" before removing
+      const cards = category.querySelectorAll(".card");
+      cards.forEach(card => categoryMap["Cartes à trier"].appendChild(card));
+      delete categoryMap[title.textContent];
+      category.remove();
+    });
+    header.appendChild(deleteBtn);
+  }
+
+  category.appendChild(header);
   board.appendChild(category);
 
-  // Save reference for adding cards
   categoryMap[name] = category;
 }
 
-function createCard(text) {
+function createCard(text, isDeletable = false) {
   const card = document.createElement("div");
   card.className = "card";
-  card.textContent = text;
   card.draggable = true;
+
+  const label = document.createElement("span");
+  label.className = "card-label";
+  label.textContent = text;
+  card.appendChild(label);
+
+  if (isDeletable) {
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "delete-btn";
+    deleteBtn.textContent = "✕";
+    deleteBtn.title = "Supprimer cette carte";
+    deleteBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      card.remove();
+    });
+    card.appendChild(deleteBtn);
+  }
 
   card.addEventListener("dragstart", () => {
     draggedCard = card;
@@ -141,7 +192,7 @@ function createCard(text) {
 
   card.addEventListener("dragend", () => {
     draggedCard = null;
-    card.style.display = "block";
+    card.style.display = "flex";
   });
 
   return card;
