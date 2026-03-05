@@ -163,7 +163,7 @@ function createCard(text) {
   document.getElementById("submit-btn").addEventListener("click", () => {
     const data = collectData();
   
-    fetch("COLLE_ICI_TON_URL_APPS_SCRIPT", {
+    fetch("https://script.google.com/macros/s/AKfycby3yxKl7WI2yipKdpU0aaq__YNubQ70Nd1rmoRDASCvcqUIfnMr8Px1luVsZqjm8J-Y/exec", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data)
