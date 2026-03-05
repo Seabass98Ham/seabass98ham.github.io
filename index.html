@@ -58,11 +58,26 @@ button:hover { background-color: #0069d8; }
 #submit-btn:hover {
   background-color: #208537;
 }
+#hec_montréal {
+  font-size: 12px;
+  color: #aaa;
+  letter-spacing: 5px;
+}
+#intro {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 30px;
+  line-height: 1.5;
+  width: 600px;
+}
+
 </style>
 </head>
 <body>
 
+<p id="hec_montréal">HEC MONTRÉAL</p>
 <h1>Activité de tri de cartes</h1>
+<p id="intro">Pour compléter l'activité, vueillez sélectionner les cartes que vous souhaitez trier dans les différentes catégories ci-dessous, via « drag and drop ». Vous pouvez également ajouter de nouvelles cartes ou catégories à tout moment, et changer le nom des catégories. Il n'y a aucune bonne ou mauvaise réponse; allez-y avec votre intuition. Lorsque vous aurez terminé, cliquez sur le bouton « Soumettre » ci-dessous pour enregistrer vos choix. Attention! Ne rechargez pas ou ne quittez pas la page en cours de route car vous devrez recommencer à nouveau.</p>
 <button id="add-card-btn">Ajoutez une carte</button>
 <button id="add-category-btn">Ajoutez une catégorie</button>
 <div class="board" id="board"></div>
@@ -138,7 +153,7 @@ function addCategory(name, isDeletable) {
 
   const title = document.createElement("h3");
   title.textContent = name;
-  title.contentEditable = true;
+  title.contentEditable = isDeletable; // Only allow editing if it's a user-created category
   header.appendChild(title);
 
   // Only add delete button for user-created categories
@@ -197,8 +212,31 @@ function createCard(text, isDeletable = false) {
 
   return card;
 }
-  
+ function confirmSubmit() {
+    if (confirm("Êtes-vous sûr de vouloir soumettre votre tri?")) {
+
+        fetch("https://script.google.com/macros/s/AKfycby3yxKl7WI2yipKdpU0aaq__YNubQ70Nd1rmoRDASCvcqUIfnMr8Px1luVsZqjm8J-Y/exec", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                value: "test"
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            alert("Merci pour votre participation! Votre tri a été envoyé avec succès.");
+            location.reload();
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Erreur lors de l'envoi.");
+        });
+
+    }
+}
 </script>
-<button id="submit-btn">Soumettre</button>
+<button id="submit-btn" onclick="confirmSubmit()">Soumettre</button>
 </body>
 </html>
