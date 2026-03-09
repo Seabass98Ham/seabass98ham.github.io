@@ -54,7 +54,7 @@ button {
 button:hover { background-color: #0069d8; }
 #submit-btn {
   background-color: #28a745;
-  margin-top: 15px;
+  margin-top: 20px;
 }
 #submit-btn:hover {
   background-color: #208537;
@@ -64,12 +64,18 @@ button:hover { background-color: #0069d8; }
   color: #aaa;
   letter-spacing: 5px;
 }
-#intro {
+.intro {
   font-size: 14px;
   color: #555;
   margin-bottom: 15px;
   line-height: 1.5;
   width: 900px;
+}
+.subtitle {
+  font-size: 10px;
+  color: #aaa;
+  letter-spacing: 5px;
+  margin-bottom: 5px;
 }
 
 </style>
@@ -78,8 +84,10 @@ button:hover { background-color: #0069d8; }
 
 <p id="hec_montréal">HEC MONTRÉAL</p>
 <h1>Activité de tri de cartes</h1>
-<p id="intro">Pour compléter l'activité, veuillez déposer les cartes à trier dans les différentes catégories ci-dessous, via « drag and drop ». Vous pouvez aussi ajouter de nouvelles cartes ou catégories à tout moment, et changer le nom de vos catégories. Il n'y a aucune bonne ou mauvaise réponse; allez-y avec votre intuition. Lorsque vous aurez terminé, cliquez sur le bouton « Soumettre » ci-dessous pour nous envoyer votre tri. Attention! Ne rechargez pas ou ne quittez pas la page avant d'avoir soumis votre tri car vous devrez recommencer à nouveau.</p>
-<p id="intro">Dans le cadre de ce tri de cartes réalisé pour un travail académique, votre participation est entièrement volontaire et anonyme. Les données recueillies lors de cette activité concernent uniquement la manière dont vous regroupez les cartes et les catégories que vous créez. Aucune information personnelle permettant de vous identifier ne sera collectée. Les résultats seront utilisés uniquement à des fins pédagogiques et ne seront partagés avec aucun tiers.</p>
+<p class="subtitle">INSTRUCTIONS</p>
+<p class="intro">Pour compléter l'activité, veuillez déposer les cartes à trier dans les différentes catégories ci-dessous, via « drag and drop ». Vous pouvez aussi ajouter de nouvelles cartes ou catégories à tout moment, et changer le nom de vos catégories. Il n'y a aucune bonne ou mauvaise réponse; allez-y avec votre intuition. Lorsque vous aurez terminé, cliquez sur le bouton « Soumettre » ci-dessous pour nous envoyer votre tri. Attention! Ne rechargez pas ou ne quittez pas la page avant d'avoir soumis votre tri car vous devrez recommencer à nouveau.</p>
+<p class="subtitle">CONFIDENTIALITÉ</p>
+<p class="intro">Dans le cadre de ce tri de cartes réalisé pour un travail académique, votre participation est entièrement volontaire et anonyme. Les données recueillies lors de cette activité concernent uniquement la manière dont vous regroupez les cartes et les catégories que vous créez. Aucune information personnelle permettant de vous identifier ne sera collectée. Les résultats seront utilisés uniquement à des fins pédagogiques et ne seront partagés avec aucun tiers.</p>
 <button id="add-card-btn">Ajoutez une carte</button>
 <button id="add-category-btn">Ajoutez une catégorie</button>
 <div class="board" id="board"></div>
