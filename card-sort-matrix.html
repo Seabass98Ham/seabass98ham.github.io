@@ -275,27 +275,27 @@
 <body>
 
 <header>
-  <h1>Card Sort<br><em>Similarity Matrix</em></h1>
+  <h1>Tri de cartes<br><em>Matrice de similarité</em></h1>
   <div class="header-meta" id="header-meta">
-    Paste your aggregated card sort table<br>to generate a similarity matrix
+    Copier/Coller votre tableau de tri de cartes<br>pour générer une matrice de similarité
   </div>
 </header>
 
 <main>
   <div id="import-panel">
     <div class="panel">
-      <div class="panel-label">Upload CSV</div>
+      <div class="panel-label">Téléverser CSV</div>
       <div id="drop-zone" onclick="document.getElementById('file-in').click()"
            ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
         <div class="drop-icon">⇡</div>
-        <p><strong>Drop file or click to browse</strong><br>
-           Export from Google Sheets:<br>File → Download → CSV (.csv)</p>
+        <p><strong>Déposez votre fichier</strong><br>
+           Exportez de Google Sheets:<br>Fichier → Télécharger → CSV (.csv)</p>
         <input type="file" id="file-in" accept=".csv,text/csv" onchange="handleFile(this)">
       </div>
     </div>
 
     <div class="panel">
-      <div class="panel-label">Paste CSV</div>
+      <div class="panel-label">Coller CSV</div>
       <textarea id="paste-in" placeholder="Row 1 : header — blank cell, then category names
 Col A : card names
 Cells : # of times that category was chosen for that card
@@ -305,46 +305,46 @@ Click 'Load sample data' to see the expected format."></textarea>
       <div class="n-row">
         <span class="n-label">Participants (N)</span>
         <input type="number" id="n-input" min="1" placeholder="e.g. 24">
-        <span class="n-hint">total who completed the sort</span>
+        <span class="n-hint">total qui ont complétés le tri</span>
       </div>
 
       <div class="btn-row">
-        <button class="primary" onclick="parseAndRender()">Build matrix</button>
-        <button onclick="loadSample()">Load sample data</button>
+        <button class="primary" onclick="parseAndRender()">Construire matrice</button>
+        <button onclick="loadSample()">Charger les données</button>
       </div>
       <div id="error-msg"></div>
     </div>
   </div>
 
   <div id="stats-bar">
-    <div class="stat"><div class="s-label">Cards</div><div class="s-val" id="s-cards">—</div></div>
-    <div class="stat"><div class="s-label">Categories</div><div class="s-val" id="s-cats">—</div></div>
+    <div class="stat"><div class="s-label">Cartes</div><div class="s-val" id="s-cards">—</div></div>
+    <div class="stat"><div class="s-label">Catégories</div><div class="s-val" id="s-cats">—</div></div>
     <div class="stat"><div class="s-label">Participants</div><div class="s-val" id="s-n">—</div></div>
-    <div class="stat"><div class="s-label">Avg agreement</div><div class="s-val" id="s-avg">—</div><div class="s-sub">across all pairs</div></div>
+    <div class="stat"><div class="s-label">Accord moyen</div><div class="s-val" id="s-avg">—</div><div class="s-sub">à travers les paires</div></div>
     <div class="stat" style="flex:2;min-width:200px">
-      <div class="s-label">Strongest pair</div>
+      <div class="s-label">Paire la plus forte</div>
       <div class="s-val" id="s-pair" style="font-size:1rem;margin-top:0.3rem;line-height:1.5">—</div>
     </div>
   </div>
 
   <div id="toolbar">
-    <span class="toolbar-label">Sort</span>
-    <button id="btn-alpha" class="active" onclick="sortAlpha()">Alphabetical</button>
+    <span class="toolbar-label">Trier</span>
+    <button id="btn-alpha" class="active" onclick="sortAlpha()">Alphabétique</button>
     <button id="btn-cluster" onclick="sortCluster()">Cluster</button>
     <div class="toolbar-sep"></div>
-    <span class="toolbar-label">Hide below</span>
+    <span class="toolbar-label">Cacher ci-dessous</span>
     <input type="range" id="thresh-slider" min="0" max="100" value="0" step="5"
            style="width:100px;accent-color:#2563eb" oninput="applyThreshold(this.value)">
     <span id="thresh-label" style="font-size:11px;color:var(--muted);min-width:32px">0%</span>
     <div class="toolbar-sep"></div>
-    <button id="btn-export" onclick="exportPNG()">↓ Download PNG</button>
+    <button id="btn-export" onclick="exportPNG()">↓ Télécharger PNG</button>
   </div>
 
   <div id="legend-wrap">
     <span>0%</span>
     <div id="legend-bar"></div>
     <span>100%</span>
-    <span style="margin-left:0.5rem;opacity:0.5">participants who co-sorted the pair</span>
+    <span style="margin-left:0.5rem;opacity:0.5">participants qui ont co-trié la paire</span>
   </div>
 
   <div id="matrix-scroll"></div>
