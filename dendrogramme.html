@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tri de cartes · Dendrogramme</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:      #ffffff;
+    --bg2:     #f7f7f5;
+    --bg3:     #eeede9;
+    --border:  rgba(0,0,0,0.08);
+    --border2: rgba(0,0,0,0.16);
+    --text:    #1a1a18;
+    --muted:   #7a7870;
+    --accent:  #8a6f2e;
+    --accent2: #3a7a56;
+    --danger:  #c87a7a;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    min-height: 100vh;
+  }
+
+  header {
+    padding: 3rem 3rem 2rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+  header h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+  header h1 em { font-style: italic; color: var(--accent); }
+  .header-meta {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    line-height: 1.8;
+    text-align: right;
+  }
+
+  main { padding: 2.5rem 3rem; }
+  @media (max-width: 700px) { main { padding: 1.5rem; } header { padding: 2rem 1.5rem 1.5rem; } }
+
+  #import-panel {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+  @media (max-width: 700px) { #import-panel { grid-template-columns: 1fr; } }
+
+  .panel {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.5rem;
+  }
+  .panel-label {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
+
+  #drop-zone {
+    border: 1px dashed var(--border2);
+    border-radius: 4px;
+    padding: 2rem 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  #drop-zone:hover, #drop-zone.over {
+    border-color: var(--accent);
+    background: rgba(200,180,122,0.04);
+  }
+  #drop-zone input { display: none; }
+  #drop-zone .drop-icon { font-size: 1.8rem; margin-bottom: 0.5rem; opacity: 0.5; }
+  #drop-zone p { color: var(--muted); font-size: 12px; line-height: 1.6; }
+  #drop-zone p strong { color: var(--text); font-weight: 400; }
+
+  textarea {
+    width: 100%;
+    height: 130px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    padding: 0.75rem;
+    resize: vertical;
+    line-height: 1.5;
+    transition: border-color 0.2s;
+  }
+  textarea:focus { outline: none; border-color: var(--accent); }
+  textarea::placeholder { color: var(--muted); }
+
+  .n-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.875rem;
+    flex-wrap: wrap;
+  }
+  .n-label { font-size: 11px; color: var(--muted); white-space: nowrap; }
+  #n-input {
+    width: 80px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 3px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    padding: 0.4rem 0.6rem;
+    transition: border-color 0.2s;
+  }
+  #n-input:focus { outline: none; border-color: var(--accent); }
+  .n-hint { font-size: 10px; color: var(--muted); opacity: 0.7; }
+
+  .btn-row { display: flex; gap: 0.75rem; margin-top: 0.875rem; flex-wrap: wrap; }
+
+  button {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    padding: 0.5rem 1rem;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: 1px solid var(--border2);
+    background: transparent;
+    color: var(--text);
+  }
+  button:hover { background: var(--bg3); border-color: var(--accent); color: var(--accent); }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #ffffff; font-weight: 500; }
+  button.primary:hover { background: #6e5820; border-color: #6e5820; }
+  button.active { border-color: var(--accent2); color: var(--accent2); }
+
+  #error-msg { color: var(--danger); font-size: 11px; margin-top: 0.75rem; min-height: 1rem; }
+
+  /* ── TOOLBAR ── */
+  #toolbar {
+    display: none;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+  .toolbar-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+  .toolbar-sep { width: 1px; height: 20px; background: var(--border2); }
+
+  /* ── CUT LINE ── */
+  #cut-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  #cut-slider {
+    width: 120px;
+    accent-color: var(--danger);
+  }
+  #cut-label { font-size: 11px; color: var(--muted); min-width: 32px; }
+
+  /* ── DENDROGRAM SVG CONTAINER ── */
+  #dendro-wrap {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 2rem;
+    overflow-x: auto;
+  }
+  #dendro-svg { display: block; }
+
+  /* ── CLUSTER LEGEND ── */
+  #cluster-legend {
+    display: none;
+    gap: 1px;
+    margin-top: 1.5rem;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    flex-wrap: wrap;
+  }
+  .cl-group {
+    flex: 1;
+    min-width: 150px;
+    background: var(--bg2);
+    padding: 1rem 1.25rem;
+  }
+  .cl-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 0.6rem;
+  }
+  .cl-swatch {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  .cl-title {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .cl-cards {
+    font-size: 11px;
+    color: var(--text);
+    line-height: 1.8;
+  }
+
+  /* tooltip */
+  #tip {
+    position: fixed;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 4px;
+    padding: 7px 11px;
+    font-size: 11px;
+    pointer-events: none;
+    display: none;
+    z-index: 1000;
+    color: var(--text);
+    white-space: nowrap;
+    font-family: 'DM Mono', monospace;
+    line-height: 1.6;
+  }
+  #tip .tip-dist { font-family: 'Fraunces', serif; font-size: 1rem; font-weight: 300; color: var(--accent); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Tri de cartes<br><em>Dendrogramme</em></h1>
+  <div class="header-meta" id="header-meta">
+    Collez votre tableau de tri de cartes<br>pour générer un dendrogramme
+  </div>
+</header>
+
+<main>
+  <!-- Éléments cachés requis par le JS -->
+  <textarea id="paste-in" style="display:none"></textarea>
+  <input type="number" id="n-input" style="display:none">
+  <div id="error-msg" style="display:none"></div>
+
+  <!-- Barre d'outils -->
+  <div id="toolbar">
+    <span class="toolbar-label">Liaison</span>
+    <button id="btn-avg" class="active" onclick="setLinkage('average')">Moyenne</button>
+    <button id="btn-single" onclick="setLinkage('single')">Simple</button>
+    <button id="btn-complete" onclick="setLinkage('complete')">Complète</button>
+    <div class="toolbar-sep"></div>
+    <div id="cut-row">
+      <span class="toolbar-label">Coupure</span>
+      <input type="range" id="cut-slider" min="0" max="100" value="0" step="1"
+             oninput="updateCut(this.value)">
+      <span id="cut-label">désactivée</span>
+    </div>
+  </div>
+
+  <div id="dendro-wrap" style="display:none">
+    <svg id="dendro-svg"></svg>
+  </div>
+</main>
+
+<div id="tip"></div>
+
+<script>
+// ── STATE ──
+let cards = [], catNames = [], vectors = [], simMatrix = [];
+let N = 0;
+let currentLinkage = 'average';
+let merges = []; // result of clustering
+let cutValue = 0;
+
+// ── DONNÉES INTÉGRÉES ──
+const BAKED_CSV = `Carte,À propos,Actualités,Calendrier,Contact,Faire un don,FAQ,Fonctionnement,Informations supplémentaires,la communauté,S'impliquer
+Blogue,0,1,0,0,0,0,0,0,0,0
+Calendrier des cueillettes,0,17,1,0,0,0,2,0,0,3
+Calendrier des récoltes,0,16,1,0,0,0,4,0,0,2
+Conditions de participation,10,0,0,0,0,0,10,0,0,3
+Contact,0,0,0,23,0,0,0,0,0,0
+Courriel,0,0,0,23,0,0,0,0,0,0
+Devenir chef de cueillette,0,0,0,0,0,0,3,0,0,20
+Évènements,0,23,0,0,0,0,0,0,0,0
+Faire un don,2,0,0,4,3,0,0,0,0,13
+FAQ,11,2,0,2,0,1,7,0,0,0
+Fonctionnement d'une cueillette,2,0,0,0,0,0,20,0,0,1
+forum communautaire,0,0,0,0,0,0,0,0,1,0
+Guide d'entretien des arbres,2,1,0,0,0,1,17,1,0,1
+Guide de récolte des fruits,2,1,0,0,0,1,16,1,0,2
+Inscription à l'infolettre,3,6,0,9,0,0,0,0,0,5
+inscription à l'infolettre x2,0,1,0,0,0,0,0,0,0,0
+Inscrire mon arbre,1,0,0,1,0,0,0,0,0,21
+Instructions pour les bénévoles,3,0,0,0,0,0,16,0,0,3
+Mission,16,1,0,0,0,0,3,0,0,3
+Notre équipe,20,0,0,2,0,0,1,0,0,0
+Notre impact,21,0,0,0,0,0,1,0,0,1
+Nouvelles,0,1,0,0,0,0,0,0,0,0
+Participer à une cueillette,0,0,0,0,0,0,0,0,0,23
+Répartition des fruits,0,1,0,0,0,0,18,0,0,4
+Réseaux sociaux,0,4,0,19,0,0,0,0,0,0
+Témoignages,0,0,0,0,0,0,1,0,0,0
+Valeurs du collectif,18,0,0,0,0,0,3,0,0,2`;
+const BAKED_N = 23;
+
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('paste-in').value = BAKED_CSV;
+  document.getElementById('n-input').value = BAKED_N;
+  parseAndRender();
+});
+
+// cluster color palette (muted, distinct)
+const CLUSTER_COLORS = [
+  '#8fb89e', '#c8b47a', '#8aacca', '#c89a7a', '#a08fb8',
+  '#7ab8b0', '#c87a8f', '#b8b88a', '#7a9ec8', '#b87a7a'
+];
+
+// ── CSV ──
+function parseCSV(text) {
+  return text.trim().split(/\r?\n/).filter(l => l.trim()).map(line => {
+    const cells = []; let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c === '"') { inQ = !inQ; }
+      else if (c === ',' && !inQ) { cells.push(cur.trim()); cur = ''; }
+      else cur += c;
+    }
+    cells.push(cur.trim());
+    return cells;
+  });
+}
+
+function handleFile(input) {
+  if (!input.files[0]) return;
+  const r = new FileReader();
+  r.onload = e => { document.getElementById('paste-in').value = e.target.result; parseAndRender(); };
+  r.readAsText(input.files[0]);
+}
+function onDragOver(e) { e.preventDefault(); document.getElementById('drop-zone').classList.add('over'); }
+function onDragLeave() { document.getElementById('drop-zone').classList.remove('over'); }
+function onDrop(e) {
+  e.preventDefault(); document.getElementById('drop-zone').classList.remove('over');
+  if (e.dataTransfer.files[0]) {
+    const r = new FileReader();
+    r.onload = ev => { document.getElementById('paste-in').value = ev.target.result; parseAndRender(); };
+    r.readAsText(e.dataTransfer.files[0]);
+  }
+}
+
+// ── PARSE ──
+function parseAndRender() {
+  setError('');
+  const nRaw = document.getElementById('n-input').value.trim();
+  if (!nRaw || isNaN(nRaw) || +nRaw < 1) {
+    setError('Entrez le nombre de participants (N) avant de générer.');
+    return;
+  }
+  N = Math.round(+nRaw);
+
+  const text = document.getElementById('paste-in').value.trim();
+  if (!text) { setError('Collez ou importez un CSV en premier.'); return; }
+
+  const rows = parseCSV(text);
+  if (rows.length < 3) { setError('Il faut au moins une ligne d\'en-tête et 2 lignes de cartes.'); return; }
+
+  catNames = rows[0].slice(1).filter(h => h !== '');
+  if (catNames.length < 2) { setError('Il faut au moins 2 colonnes de catégories.'); return; }
+
+  cards = []; vectors = [];
+  for (let i = 1; i < rows.length; i++) {
+    const row = rows[i];
+    if (!row[0] && row.slice(1).every(c => !c)) continue;
+    cards.push(row[0] || ('Carte ' + i));
+    vectors.push(catNames.map((_, ci) => parseFloat(row[ci+1]) || 0));
+  }
+  if (cards.length < 2) { setError('Il faut au moins 2 lignes de cartes.'); return; }
+
+  // co-occurrence similarity → distance
+  const n = cards.length;
+  simMatrix = Array.from({length: n}, () => new Array(n).fill(0));
+  for (let i = 0; i < n; i++) {
+    simMatrix[i][i] = 1;
+    for (let j = i+1; j < n; j++) {
+      let co = 0;
+      for (let k = 0; k < catNames.length; k++) co += Math.min(vectors[i][k], vectors[j][k]);
+      const sim = Math.min(co / N, 1);
+      simMatrix[i][j] = simMatrix[j][i] = sim;
+    }
+  }
+
+  document.getElementById('header-meta').innerHTML =
+    `${cards.length} cartes &nbsp;·&nbsp; ${catNames.length} catégories &nbsp;·&nbsp; N = ${N}`;
+  document.getElementById('toolbar').style.display = 'flex';
+  document.getElementById('dendro-wrap').style.display = 'block';
+
+  // reset cut
+  cutValue = 0;
+  document.getElementById('cut-slider').value = 0;
+  document.getElementById('cut-label').textContent = 'désactivée';
+
+  cluster();
+}
+
+// ── HIERARCHICAL CLUSTERING (agglomerative) ──
+function distMatrix() {
+  const n = cards.length;
+  const d = Array.from({length: n}, (_,i) => Array.from({length: n}, (_,j) => 1 - simMatrix[i][j]));
+  return d;
+}
+
+function cluster() {
+  const n = cards.length;
+  const dist = distMatrix();
+
+  // each cluster starts as a single leaf: { leaves: [i], height: 0 }
+  let clusters = cards.map((_, i) => ({ leaves: [i], height: 0, id: i }));
+  // working distance table between current clusters
+  let d = dist.map(r => [...r]);
+  merges = [];
+
+  for (let step = 0; step < n - 1; step++) {
+    // find closest pair
+    let minD = Infinity, minA = 0, minB = 1;
+    for (let i = 0; i < clusters.length; i++) {
+      for (let j = i+1; j < clusters.length; j++) {
+        if (d[i][j] < minD) { minD = d[i][j]; minA = i; minB = j; }
+      }
+    }
+
+    const ca = clusters[minA], cb = clusters[minB];
+    const newCluster = {
+      left: ca,
+      right: cb,
+      height: minD,
+      leaves: [...ca.leaves, ...cb.leaves],
+      id: n + step
+    };
+    merges.push({ a: ca, b: cb, dist: minD, merged: newCluster });
+
+    // update distance table using chosen linkage
+    const newDists = [];
+    const remaining = [];
+    for (let i = 0; i < clusters.length; i++) {
+      if (i === minA || i === minB) continue;
+      let nd;
+      if (currentLinkage === 'single') {
+        nd = Math.min(d[minA][i], d[minB][i]);
+      } else if (currentLinkage === 'complete') {
+        nd = Math.max(d[minA][i], d[minB][i]);
+      } else { // average (UPGMA)
+        const na = ca.leaves.length, nb = cb.leaves.length;
+        nd = (na * d[minA][i] + nb * d[minB][i]) / (na + nb);
+      }
+      newDists.push(nd);
+      remaining.push(i);
+    }
+
+    // rebuild clusters and distance table
+    const newClusters = remaining.map(i => clusters[i]);
+    newClusters.push(newCluster);
+    const sz = newClusters.length;
+    const nd2 = Array.from({length: sz}, () => new Array(sz).fill(0));
+    for (let i = 0; i < remaining.length; i++) {
+      for (let j = 0; j < remaining.length; j++) {
+        nd2[i][j] = d[remaining[i]][remaining[j]];
+      }
+      nd2[i][sz-1] = nd2[sz-1][i] = newDists[i];
+    }
+    clusters = newClusters;
+    d = nd2;
+  }
+
+  // root is clusters[0]
+  drawDendrogram(clusters[0]);
+}
+
+// ── DRAW ──
+function drawDendrogram(root) {
+  const svg = document.getElementById('dendro-svg');
+  svg.innerHTML = '';
+
+  const n = cards.length;
+  const FONT_SIZE = 11;
+  const FONT = `${FONT_SIZE}px 'Courier New', monospace`;
+
+  // Measure longest card name to set LABEL_W dynamically
+  const tmp = document.createElement('canvas').getContext('2d');
+  tmp.font = FONT;
+  const maxLabelW = Math.max(...cards.map(c => tmp.measureText(c).width));
+  const LABEL_W = Math.ceil(maxLabelW) + 28; // 28px = dot + gap + right margin
+
+  const ROW_H = 36;
+  const CHART_H = n * ROW_H;
+  const PAD_TOP = 20;
+  const PAD_BOT = 40;
+  const PAD_RIGHT = 30;
+  const AXIS_H = 30;
+
+  // leaf order: in-order traversal of tree
+  const leafOrder = [];
+  function traverse(node) {
+    if (!node.left) { leafOrder.push(node.leaves[0]); return; }
+    traverse(node.left);
+    traverse(node.right);
+  }
+  traverse(root);
+
+  const totalH = PAD_TOP + CHART_H + AXIS_H + PAD_BOT;
+  const maxDist = root.height || 1;
+
+  // dynamic width
+  const wrapW = document.getElementById('dendro-wrap').clientWidth - 64;
+  const CHART_W = Math.max(300, wrapW - LABEL_W - PAD_RIGHT);
+  const totalW = LABEL_W + CHART_W + PAD_RIGHT;
+
+  svg.setAttribute('width', totalW);
+  svg.setAttribute('height', totalH);
+  svg.setAttribute('viewBox', `0 0 ${totalW} ${totalH}`);
+
+  // helpers
+  const xScale = d => LABEL_W + (d / maxDist) * CHART_W;
+  const yScale = i => PAD_TOP + (leafOrder.indexOf(i) + 0.5) * ROW_H;
+
+  // collect all node positions for drawing
+  const nodePos = new Map(); // node id → {x, y}
+
+  function computePos(node) {
+    if (!node.left) {
+      nodePos.set(node.id, { x: xScale(0), y: yScale(node.leaves[0]) });
+      return;
+    }
+    computePos(node.left);
+    computePos(node.right);
+    const lp = nodePos.get(node.left.id);
+    const rp = nodePos.get(node.right.id);
+    const mx = xScale(node.height);
+    const my = (lp.y + rp.y) / 2;
+    nodePos.set(node.id, { x: mx, y: my });
+  }
+  computePos(root);
+
+  // cut line value in distance units
+  const cutDist = cutValue > 0 ? (cutValue / 100) * maxDist : null;
+
+  // determine cluster coloring if cut is active
+  let leafColor = new Array(n).fill(null);
+  if (cutDist !== null) {
+    const clusters = getClustersAtCut(root, cutDist);
+    clusters.forEach((cluster, ci) => {
+      cluster.forEach(li => { leafColor[li] = CLUSTER_COLORS[ci % CLUSTER_COLORS.length]; });
+    });
+  } else {
+  }
+
+  // draw branches
+  function drawNode(node) {
+    if (!node.left) return;
+    drawNode(node.left);
+    drawNode(node.right);
+
+    const lp = nodePos.get(node.left.id);
+    const rp = nodePos.get(node.right.id);
+    const np = nodePos.get(node.id);
+
+    // determine color: if cut is active and this merge is below the cut, color by cluster
+    let strokeColor = 'rgba(80,76,68,0.35)';
+    if (cutDist !== null && node.height <= cutDist) {
+      // find representative leaf color
+      const col = leafColor[node.leaves[0]];
+      if (col) strokeColor = col;
+    }
+
+    // vertical bar connecting left and right
+    drawLine(svg, np.x, lp.y, np.x, rp.y, strokeColor, 1.5);
+    // horizontal arms to children
+    drawLine(svg, np.x, lp.y, lp.x, lp.y, strokeColor, 1.5);
+    drawLine(svg, np.x, rp.y, rp.x, rp.y, strokeColor, 1.5);
+
+    // hover target on the merge bar (vertical line)
+    const hitH = Math.abs(rp.y - lp.y) + 4;
+    const hitY = Math.min(lp.y, rp.y) - 2;
+    const hit = makeSVG('rect');
+    hit.setAttribute('x', np.x - 6);
+    hit.setAttribute('y', hitY);
+    hit.setAttribute('width', 12);
+    hit.setAttribute('height', hitH);
+    hit.setAttribute('fill', 'transparent');
+    hit.setAttribute('cursor', 'default');
+    hit.dataset.dist = node.height.toFixed(3);
+    hit.dataset.sim = (1 - node.height).toFixed(3);
+    hit.dataset.cards = node.leaves.map(i => cards[i]).join(', ');
+    hit.addEventListener('mouseenter', showTip);
+    hit.addEventListener('mouseleave', hideTip);
+    hit.addEventListener('mousemove', moveTip);
+    svg.appendChild(hit);
+  }
+  drawNode(root);
+
+  // draw cut line
+  if (cutDist !== null) {
+    const cx = xScale(cutDist);
+    const line = makeSVG('line');
+    line.setAttribute('x1', cx); line.setAttribute('y1', PAD_TOP - 10);
+    line.setAttribute('x2', cx); line.setAttribute('y2', PAD_TOP + CHART_H + 10);
+    line.setAttribute('stroke', 'rgba(200,122,122,0.7)');
+    line.setAttribute('stroke-width', '1');
+    line.setAttribute('stroke-dasharray', '4 3');
+    svg.appendChild(line);
+  }
+
+  // leaf labels
+  leafOrder.forEach((cardIdx, pos) => {
+    const y = PAD_TOP + (pos + 0.5) * ROW_H;
+    const col = leafColor[cardIdx];
+
+    // colored dot if clustered
+    if (col) {
+      const dot = makeSVG('circle');
+      dot.setAttribute('cx', LABEL_W - 12);
+      dot.setAttribute('cy', y);
+      dot.setAttribute('r', 3);
+      dot.setAttribute('fill', col);
+      svg.appendChild(dot);
+    }
+
+    // horizontal leader from label to tree
+    const leader = makeSVG('line');
+    leader.setAttribute('x1', col ? LABEL_W - 7 : LABEL_W - 2);
+    leader.setAttribute('y1', y);
+    leader.setAttribute('x2', xScale(0));
+    leader.setAttribute('y2', y);
+    leader.setAttribute('stroke', 'rgba(0,0,0,0.06)');
+    leader.setAttribute('stroke-width', '1');
+    leader.setAttribute('stroke-dasharray', '2 3');
+    svg.appendChild(leader);
+
+    const text = makeSVG('text');
+    text.setAttribute('x', col ? LABEL_W - 18 : LABEL_W - 6);
+    text.setAttribute('y', y);
+    text.setAttribute('text-anchor', 'end');
+    text.setAttribute('dominant-baseline', 'central');
+    text.setAttribute('fill', col || 'rgba(40,38,32,0.75)');
+    text.setAttribute('font-family', "'DM Mono', monospace");
+    text.setAttribute('font-size', '11');
+    text.textContent = cards[cardIdx];
+    svg.appendChild(text);
+  });
+
+  // x-axis: similarity scale (inverted from distance)
+  const axisY = PAD_TOP + CHART_H + 16;
+  const axisLine = makeSVG('line');
+  axisLine.setAttribute('x1', LABEL_W); axisLine.setAttribute('y1', axisY);
+  axisLine.setAttribute('x2', LABEL_W + CHART_W); axisLine.setAttribute('y2', axisY);
+  axisLine.setAttribute('stroke', 'rgba(0,0,0,0.15)');
+  axisLine.setAttribute('stroke-width', '0.5');
+  svg.appendChild(axisLine);
+
+  const tickCount = 6;
+  for (let t = 0; t <= tickCount; t++) {
+    const dist = (t / tickCount) * maxDist;
+    const sim = Math.round((1 - dist) * 100);
+    const tx = xScale(dist);
+
+    const tick = makeSVG('line');
+    tick.setAttribute('x1', tx); tick.setAttribute('y1', axisY);
+    tick.setAttribute('x2', tx); tick.setAttribute('y2', axisY + 5);
+    tick.setAttribute('stroke', 'rgba(0,0,0,0.2)');
+    tick.setAttribute('stroke-width', '0.5');
+    svg.appendChild(tick);
+
+    const label = makeSVG('text');
+    label.setAttribute('x', tx);
+    label.setAttribute('y', axisY + 16);
+    label.setAttribute('text-anchor', 'middle');
+    label.setAttribute('fill', 'rgba(80,76,68,0.9)');
+    label.setAttribute('font-family', "'DM Mono', monospace");
+    label.setAttribute('font-size', '10');
+    label.textContent = sim + '%';
+    svg.appendChild(label);
+  }
+
+  // axis label
+  const axLabel = makeSVG('text');
+  axLabel.setAttribute('x', LABEL_W + CHART_W / 2);
+  axLabel.setAttribute('y', axisY + 30);
+  axLabel.setAttribute('text-anchor', 'middle');
+  axLabel.setAttribute('fill', 'rgba(80,76,68,0.5)');
+  axLabel.setAttribute('font-family', "'DM Mono', monospace");
+  axLabel.setAttribute('font-size', '10');
+  axLabel.textContent = 'similarité (% co-triés)';
+  svg.appendChild(axLabel);
+}
+
+// ── HELPERS ──
+function makeSVG(tag) {
+  return document.createElementNS('http://www.w3.org/2000/svg', tag);
+}
+function drawLine(svg, x1, y1, x2, y2, stroke, width) {
+  const l = makeSVG('line');
+  l.setAttribute('x1', x1); l.setAttribute('y1', y1);
+  l.setAttribute('x2', x2); l.setAttribute('y2', y2);
+  l.setAttribute('stroke', stroke);
+  l.setAttribute('stroke-width', width);
+  l.setAttribute('stroke-linecap', 'round');
+  svg.appendChild(l);
+}
+
+// ── CUT CLUSTERS ──
+function getClustersAtCut(node, cutDist) {
+  // return array of leaf arrays: groups formed by cutting at cutDist
+  const groups = [];
+  function visit(n) {
+    if (!n.left || n.height > cutDist) {
+      groups.push(n.leaves);
+      return;
+    }
+    visit(n.left);
+    visit(n.right);
+  }
+  visit(node);
+  // sort by size desc
+  groups.sort((a, b) => b.length - a.length);
+  return groups;
+}
+
+// ── LEGEND ──
+function renderLegend(clusters) {
+  const legend = document.getElementById('cluster-legend');
+  legend.innerHTML = '';
+  legend.style.display = 'flex';
+  clusters.forEach((group, ci) => {
+    const color = CLUSTER_COLORS[ci % CLUSTER_COLORS.length];
+    const div = document.createElement('div');
+    div.className = 'cl-group';
+    div.innerHTML = `
+      <div class="cl-header">
+        <div class="cl-swatch" style="background:${color}"></div>
+        <div class="cl-title">Groupe ${ci + 1} &nbsp;(${group.length})</div>
+      </div>
+      <div class="cl-cards">${group.map(i => esc(cards[i])).join('<br>')}</div>`;
+    legend.appendChild(div);
+  });
+}
+
+// ── TOOLTIP ──
+function showTip(e) {
+  const el = e.currentTarget;
+  const tip = document.getElementById('tip');
+  const sim = Math.round(+el.dataset.sim * 100);
+  tip.innerHTML =
+    `<div class="tip-dist">${sim}% de similarité</div>` +
+    `<div style="color:var(--muted);font-size:10px;margin-top:2px">${esc(el.dataset.cards)}</div>`;
+  tip.style.display = 'block';
+  positionTip(e);
+}
+function hideTip() { document.getElementById('tip').style.display = 'none'; }
+function moveTip(e) { positionTip(e); }
+function positionTip(e) {
+  let x = e.clientX + 14, y = e.clientY - 14;
+  if (x + 240 > window.innerWidth) x = e.clientX - 250;
+  const tip = document.getElementById('tip');
+  tip.style.left = x + 'px'; tip.style.top = y + 'px';
+}
+
+// ── CONTROLS ──
+function setLinkage(type) {
+  currentLinkage = type;
+  document.getElementById('btn-avg').classList.toggle('active', type === 'average');
+  document.getElementById('btn-single').classList.toggle('active', type === 'single');
+  document.getElementById('btn-complete').classList.toggle('active', type === 'complete');
+  cluster();
+}
+
+function updateCut(val) {
+  cutValue = +val;
+  document.getElementById('cut-label').textContent = val > 0 ? val + '%' : 'désactivée';
+  // re-render root
+  if (merges.length > 0) {
+    const rootNode = merges[merges.length - 1].merged;
+    drawDendrogram(rootNode);
+  }
+}
+
+function loadSample() {
+  document.getElementById('n-input').value = '30';
+  document.getElementById('paste-in').value =
+`carte,Navigation,Compte,Achats,Assistance,Information
+Page d'accueil,24,3,6,2,10
+Recherche,20,2,18,1,8
+Page produit,3,1,26,1,14
+Panier,2,2,28,3,3
+Paiement,1,2,27,5,2
+Mon compte,3,26,5,7,4
+Historique des commandes,2,22,12,8,5
+Liste de souhaits,2,5,24,2,5
+Centre d'aide,2,3,2,28,8
+Retours,1,4,8,24,5
+Nous contacter,1,2,3,27,6
+À propos,4,1,2,6,24`;
+  parseAndRender();
+}
+
+// ── EXPORT PNG ──
+function exportPNG(btn) {
+  if (!merges.length) return;
+  const origText = btn.textContent;
+  btn.textContent = 'Génération…';
+  btn.disabled = true;
+
+  setTimeout(() => {
+    try {
+      drawAndDownload();
+    } finally {
+      btn.textContent = origText;
+      btn.disabled = false;
+    }
+  }, 20);
+}
+
+function drawAndDownload() {
+  const SCALE = 3;
+  const FONT_MONO = `'Courier New', monospace`;
+
+  // Layout constants (pre-scale, matching drawDendrogram)
+  const n = cards.length;
+  const FONT_SIZE = 11;
+
+  // Measure label width with canvas
+  const tmpCtx = document.createElement('canvas').getContext('2d');
+  tmpCtx.font = `400 ${FONT_SIZE * SCALE}px ${FONT_MONO}`;
+  const maxLabelW = Math.max(...cards.map(c => tmpCtx.measureText(c).width)) / SCALE;
+  const LABEL_W = Math.ceil(maxLabelW) + 28;
+
+  const ROW_H   = 36;
+  const CHART_H = n * ROW_H;
+  const PAD_TOP = 20;
+  const PAD_BOT = 40;
+  const PAD_RIGHT = 30;
+  const AXIS_H  = 30;
+  const OUTER_PAD = 40;
+
+  const CHART_W = 600;
+  const totalW  = LABEL_W + CHART_W + PAD_RIGHT;
+  const totalH  = PAD_TOP + CHART_H + AXIS_H + PAD_BOT;
+
+  const canvas = document.createElement('canvas');
+  canvas.width  = (totalW + OUTER_PAD * 2) * SCALE;
+  canvas.height = (totalH + OUTER_PAD * 2) * SCALE;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(SCALE, SCALE);
+
+  const W = canvas.width / SCALE;
+  const H = canvas.height / SCALE;
+
+  // White background
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, W, H);
+
+  // Offset everything by OUTER_PAD
+  ctx.translate(OUTER_PAD, OUTER_PAD);
+
+  // Re-run clustering to get node positions
+  const root = merges[merges.length - 1].merged;
+  const maxDist = root.height || 1;
+
+  const xScale = d => LABEL_W + (d / maxDist) * CHART_W;
+  const leafOrder = [];
+  function traverse(node) {
+    if (!node.left) { leafOrder.push(node.leaves[0]); return; }
+    traverse(node.left);
+    traverse(node.right);
+  }
+  traverse(root);
+  const yScale = i => PAD_TOP + (leafOrder.indexOf(i) + 0.5) * ROW_H;
+
+  const nodePos = new Map();
+  function computePos(node) {
+    if (!node.left) {
+      nodePos.set(node.id, { x: xScale(0), y: yScale(node.leaves[0]) });
+      return;
+    }
+    computePos(node.left);
+    computePos(node.right);
+    const lp = nodePos.get(node.left.id);
+    const rp = nodePos.get(node.right.id);
+    nodePos.set(node.id, { x: xScale(node.height), y: (lp.y + rp.y) / 2 });
+  }
+  computePos(root);
+
+  // Cut & colors
+  const cutDist = cutValue > 0 ? (cutValue / 100) * maxDist : null;
+  const leafColor = new Array(n).fill(null);
+  if (cutDist !== null) {
+    const clusters = getClustersAtCut(root, cutDist);
+    clusters.forEach((cluster, ci) => {
+      cluster.forEach(li => { leafColor[li] = CLUSTER_COLORS[ci % CLUSTER_COLORS.length]; });
+    });
+  }
+
+  // Draw leader lines
+  leafOrder.forEach((cardIdx, pos) => {
+    const y = PAD_TOP + (pos + 0.5) * ROW_H;
+    const col = leafColor[cardIdx];
+    ctx.setLineDash([2, 3]);
+    ctx.strokeStyle = 'rgba(0,0,0,0.07)';
+    ctx.lineWidth = 0.5;
+    ctx.beginPath();
+    ctx.moveTo(col ? LABEL_W - 7 : LABEL_W - 2, y);
+    ctx.lineTo(xScale(0), y);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  // Draw branches
+  function drawNodeCanvas(node) {
+    if (!node.left) return;
+    drawNodeCanvas(node.left);
+    drawNodeCanvas(node.right);
+    const lp = nodePos.get(node.left.id);
+    const rp = nodePos.get(node.right.id);
+    const np = nodePos.get(node.id);
+    let color = 'rgba(80,76,68,0.4)';
+    if (cutDist !== null && node.height <= cutDist) {
+      const col = leafColor[node.leaves[0]];
+      if (col) color = col;
+    }
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.5;
+    ctx.lineCap = 'round';
+    ctx.setLineDash([]);
+    // vertical bar
+    ctx.beginPath(); ctx.moveTo(np.x, lp.y); ctx.lineTo(np.x, rp.y); ctx.stroke();
+    // horizontal arms
+    ctx.beginPath(); ctx.moveTo(np.x, lp.y); ctx.lineTo(lp.x, lp.y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(np.x, rp.y); ctx.lineTo(rp.x, rp.y); ctx.stroke();
+  }
+  drawNodeCanvas(root);
+
+  // Cut line
+  if (cutDist !== null) {
+    const cx = xScale(cutDist);
+    ctx.strokeStyle = 'rgba(200,100,100,0.7)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 3]);
+    ctx.beginPath();
+    ctx.moveTo(cx, PAD_TOP - 10);
+    ctx.lineTo(cx, PAD_TOP + CHART_H + 10);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // Leaf labels + dots
+  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'right';
+  leafOrder.forEach((cardIdx, pos) => {
+    const y = PAD_TOP + (pos + 0.5) * ROW_H;
+    const col = leafColor[cardIdx];
+    if (col) {
+      ctx.fillStyle = col;
+      ctx.beginPath();
+      ctx.arc(LABEL_W - 12, y, 3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.fillStyle = col || 'rgba(40,38,32,0.8)';
+    ctx.font = `400 ${FONT_SIZE}px ${FONT_MONO}`;
+    ctx.fillText(cards[cardIdx], col ? LABEL_W - 18 : LABEL_W - 6, y);
+  });
+
+  // X-axis line
+  const axisY = PAD_TOP + CHART_H + 16;
+  ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+  ctx.lineWidth = 0.5;
+  ctx.setLineDash([]);
+  ctx.beginPath();
+  ctx.moveTo(LABEL_W, axisY);
+  ctx.lineTo(LABEL_W + CHART_W, axisY);
+  ctx.stroke();
+
+  // Ticks + labels
+  const tickCount = 6;
+  for (let t = 0; t <= tickCount; t++) {
+    const dist = (t / tickCount) * maxDist;
+    const sim = Math.round((1 - dist) * 100);
+    const tx = xScale(dist);
+    ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+    ctx.lineWidth = 0.5;
+    ctx.beginPath(); ctx.moveTo(tx, axisY); ctx.lineTo(tx, axisY + 5); ctx.stroke();
+    ctx.fillStyle = 'rgba(80,76,68,0.9)';
+    ctx.font = `400 10px ${FONT_MONO}`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText(sim + '%', tx, axisY + 7);
+  }
+
+  // Axis label
+  ctx.fillStyle = 'rgba(80,76,68,0.5)';
+  ctx.font = `400 10px ${FONT_MONO}`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  ctx.fillText('similarité (% co-triés)', LABEL_W + CHART_W / 2, axisY + 22);
+
+  // Download
+  canvas.toBlob(blob => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'dendrogramme.png';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }, 'image/png');
+}
+
+function setError(msg) { document.getElementById('error-msg').textContent = msg; }
+function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// redraw on resize
+window.addEventListener('resize', () => {
+  if (merges.length > 0) drawDendrogram(merges[merges.length-1].merged);
+});
+</script>
+</body>
+</html>
