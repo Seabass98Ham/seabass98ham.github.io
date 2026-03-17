@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tri de cartes · Données</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:         #f4f7fc;
+  --surface:    #ffffff;
+  --surface2:   #eef3fb;
+  --border:     #dae3f5;
+  --border2:    #c3d4ee;
+  --text:       #0f1c3f;
+  --text2:      #3d5580;
+  --muted:      #7d94bb;
+  --blue-900:   #0f1c3f;
+  --blue-800:   #1e3a6e;
+  --blue-700:   #1d4ed8;
+  --blue-600:   #2563eb;
+  --blue-500:   #3b82f6;
+  --blue-400:   #60a5fa;
+  --blue-200:   #bfdbfe;
+  --blue-100:   #dbeafe;
+  --blue-50:    #eff6ff;
+  --danger:     #dc2626;
+  --row-odd:    #f8faff;
+  --row-even:   #ffffff;
+  --row-hover:  #eff6ff;
+  --header-bg:  #1e3a6e;
+  --header-fg:  #ffffff;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  min-height: 100vh;
+}
+
+/* ── HEADER ── */
+header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 2.5rem 3rem 2rem;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+header h1 {
+  font-family: 'Fraunces', serif;
+  font-weight: 300;
+  font-size: clamp(1.6rem, 3.5vw, 2.6rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--blue-900);
+}
+header h1 em {
+  font-style: italic;
+  color: var(--blue-600);
+}
+.header-meta {
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  line-height: 1.9;
+  text-align: right;
+}
+
+main { padding: 2.5rem 3rem; max-width: 1400px; }
+@media (max-width: 700px) { main { padding: 1.5rem; } header { padding: 1.5rem; } }
+
+/* ── IMPORT PANEL ── */
+#import-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+@media (max-width: 700px) { #import-panel { grid-template-columns: 1fr; } }
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+.panel-label {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 1rem;
+}
+
+#drop-zone {
+  border: 1.5px dashed var(--border2);
+  border-radius: 6px;
+  padding: 2.5rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  background: var(--blue-50);
+}
+#drop-zone:hover, #drop-zone.over {
+  border-color: var(--blue-500);
+  background: #e8f0fe;
+}
+#drop-zone input { display: none; }
+.drop-icon {
+  font-size: 2rem;
+  margin-bottom: 0.6rem;
+  color: var(--blue-400);
+  line-height: 1;
+}
+#drop-zone p { color: var(--text2); font-size: 12px; line-height: 1.7; }
+#drop-zone p strong { color: var(--text); font-weight: 500; }
+
+textarea {
+  width: 100%;
+  height: 140px;
+  background: var(--blue-50);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  padding: 0.75rem;
+  resize: vertical;
+  line-height: 1.5;
+  transition: border-color 0.2s;
+}
+textarea:focus { outline: none; border-color: var(--blue-500); }
+textarea::placeholder { color: var(--muted); }
+
+/* ── TITLE INPUT ── */
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.875rem;
+  flex-wrap: wrap;
+}
+.title-label { font-size: 11px; color: var(--muted); white-space: nowrap; }
+#title-input {
+  flex: 1;
+  min-width: 140px;
+  background: var(--blue-50);
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  padding: 0.4rem 0.65rem;
+  transition: border-color 0.2s;
+}
+#title-input:focus { outline: none; border-color: var(--blue-500); }
+
+.btn-row { display: flex; gap: 0.75rem; margin-top: 0.875rem; flex-wrap: wrap; }
+
+button {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  color: var(--text2);
+}
+button:hover { background: var(--blue-50); border-color: var(--blue-500); color: var(--blue-700); }
+button.primary {
+  background: var(--blue-700);
+  border-color: var(--blue-700);
+  color: #fff;
+  font-weight: 500;
+}
+button.primary:hover { background: var(--blue-800); border-color: var(--blue-800); }
+button.export-btn {
+  background: var(--blue-600);
+  border-color: var(--blue-600);
+  color: #fff;
+  font-weight: 500;
+}
+button.export-btn:hover { background: var(--blue-700); border-color: var(--blue-700); }
+
+#error-msg { color: var(--danger); font-size: 11px; margin-top: 0.75rem; min-height: 1rem; }
+
+/* ── TOOLBAR ── */
+#toolbar {
+  display: none;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.875rem 1.25rem;
+}
+.toolbar-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.toolbar-sep { width: 1px; height: 20px; background: var(--border2); }
+
+#search-input {
+  background: var(--blue-50);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  padding: 0.35rem 0.65rem;
+  width: 160px;
+  transition: border-color 0.2s;
+}
+#search-input:focus { outline: none; border-color: var(--blue-500); }
+#search-input::placeholder { color: var(--muted); }
+
+#row-count {
+  font-size: 11px;
+  color: var(--muted);
+  margin-left: auto;
+}
+
+/* ── TABLE WRAPPER ── */
+#table-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(30,58,138,0.06), 0 4px 16px rgba(30,58,138,0.04);
+}
+#table-scroll { overflow-x: auto; }
+
+/* ── THE TABLE ── */
+table.data-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 12px;
+}
+
+table.data-table thead tr {
+  background: var(--header-bg);
+}
+table.data-table thead th {
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--header-fg);
+  white-space: nowrap;
+  border-right: 1px solid rgba(255,255,255,0.08);
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  transition: background 0.15s;
+}
+table.data-table thead th:last-child { border-right: none; }
+table.data-table thead th:hover { background: #264d8c; }
+table.data-table thead th .sort-icon {
+  display: inline-block;
+  margin-left: 6px;
+  opacity: 0.4;
+  font-size: 9px;
+  vertical-align: middle;
+}
+table.data-table thead th.sort-asc .sort-icon,
+table.data-table thead th.sort-desc .sort-icon { opacity: 1; color: var(--blue-200); }
+
+/* row count column */
+table.data-table thead th.num-col,
+table.data-table tbody td.num-col {
+  width: 44px;
+  min-width: 44px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 10px;
+  padding-left: 8px;
+  padding-right: 8px;
+  border-right: 1px solid var(--border);
+  background: var(--row-odd);
+  cursor: default;
+}
+table.data-table thead th.num-col {
+  background: #162d56;
+  color: rgba(255,255,255,0.4);
+  cursor: default;
+}
+table.data-table thead th.num-col:hover { background: #162d56; }
+
+table.data-table tbody tr { transition: background 0.1s; }
+table.data-table tbody tr:nth-child(odd)  td { background: var(--row-odd); }
+table.data-table tbody tr:nth-child(even) td { background: var(--row-even); }
+table.data-table tbody tr:hover td { background: var(--row-hover) !important; }
+
+table.data-table tbody td {
+  padding: 10px 16px;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  white-space: nowrap;
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  font-size: 12px;
+  line-height: 1.4;
+}
+table.data-table tbody td:last-child { border-right: none; }
+table.data-table tbody tr:last-child td { border-bottom: none; }
+
+/* numeric cells right-aligned */
+table.data-table tbody td.is-num {
+  text-align: right;
+  color: var(--blue-800);
+  font-variant-numeric: tabular-nums;
+}
+
+/* highlight matched search text */
+mark {
+  background: #fde68a;
+  color: var(--text);
+  border-radius: 2px;
+  padding: 0 1px;
+}
+
+/* ── TABLE FOOTER ── */
+#table-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.25rem;
+  border-top: 1px solid var(--border);
+  background: var(--blue-50);
+  font-size: 11px;
+  color: var(--muted);
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* ── EMPTY STATE ── */
+#empty-state {
+  padding: 4rem 2rem;
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 2;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Tri de cartes<br><em>Données brutes</em></h1>
+  <div class="header-meta" id="header-meta">
+    27 cartes &nbsp;·&nbsp; 10 catégories &nbsp;·&nbsp; N = 23
+  </div>
+</header>
+
+<main>
+  <!-- Hidden elements kept for JS references -->
+  <textarea id="paste-in" style="display:none"></textarea>
+  <input type="text" id="title-input" style="display:none">
+  <div id="error-msg" style="display:none"></div>
+
+  <!-- Toolbar (search only, no export) -->
+  <div id="toolbar">
+    <span class="toolbar-label">Recherche</span>
+    <input type="text" id="search-input" placeholder="Filtrer les rangées…" oninput="filterRows(this.value)">
+    <div class="toolbar-sep"></div>
+    <span id="row-count"></span>
+  </div>
+
+  <!-- Table -->
+  <div id="table-wrap" style="display:none">
+    <div id="table-scroll"></div>
+    <div id="table-footer">
+      <span id="footer-left"></span>
+      <span id="footer-right">tri de cartes · tableau</span>
+    </div>
+  </div>
+</main>
+
+<script>
+// ── STATE ──
+let headers = [];
+let allRows = [];
+let visibleRows = [];
+let sortCol = -1;
+let sortDir = 1; // 1 asc, -1 desc
+let currentTitle = '';
+
+// ── BAKED-IN DATA ──
+const BAKED_CSV = `Carte,À propos,Actualités,Calendrier,Contact,Faire un don,FAQ,Fonctionnement,Informations supplémentaires,la communauté,S'impliquer
+Blogue,0,1,0,0,0,0,0,0,0,0
+Calendrier des cueillettes,0,17,1,0,0,0,2,0,0,3
+Calendrier des récoltes,0,16,1,0,0,0,4,0,0,2
+Conditions de participation,10,0,0,0,0,0,10,0,0,3
+Contact,0,0,0,23,0,0,0,0,0,0
+Courriel,0,0,0,23,0,0,0,0,0,0
+Devenir chef de cueillette,0,0,0,0,0,0,3,0,0,20
+Évènements,0,23,0,0,0,0,0,0,0,0
+Faire un don,2,0,0,4,3,0,0,0,0,13
+FAQ,11,2,0,2,0,1,7,0,0,0
+Fonctionnement d'une cueillette,2,0,0,0,0,0,20,0,0,1
+forum communautaire,0,0,0,0,0,0,0,0,1,0
+Guide d'entretien des arbres,2,1,0,0,0,1,17,1,0,1
+Guide de récolte des fruits,2,1,0,0,0,1,16,1,0,2
+Inscription à l'infolettre,3,6,0,9,0,0,0,0,0,5
+inscription à l'infolettre x2,0,1,0,0,0,0,0,0,0,0
+Inscrire mon arbre,1,0,0,1,0,0,0,0,0,21
+Instructions pour les bénévoles,3,0,0,0,0,0,16,0,0,3
+Mission,16,1,0,0,0,0,3,0,0,3
+Notre équipe,20,0,0,2,0,0,1,0,0,0
+Notre impact,21,0,0,0,0,0,1,0,0,1
+Nouvelles,0,1,0,0,0,0,0,0,0,0
+Participer à une cueillette,0,0,0,0,0,0,0,0,0,23
+Répartition des fruits,0,1,0,0,0,0,18,0,0,4
+Réseaux sociaux,0,4,0,19,0,0,0,0,0,0
+Témoignages,0,0,0,0,0,0,1,0,0,0
+Valeurs du collectif,18,0,0,0,0,0,3,0,0,2`;
+
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('paste-in').value = BAKED_CSV;
+  parseAndRender();
+});
+
+// ── CSV PARSE ──
+function parseCSV(text) {
+  const lines = text.trim().split(/\r?\n/).filter(l => l.trim());
+  return lines.map(line => {
+    const cells = []; let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c === '"') { inQ = !inQ; }
+      else if (c === ',' && !inQ) { cells.push(cur.trim()); cur = ''; }
+      else cur += c;
+    }
+    cells.push(cur.trim());
+    return cells;
+  });
+}
+
+// ── FILE INPUT ──
+function handleFile(input) {
+  if (!input.files[0]) return;
+  const r = new FileReader();
+  r.onload = e => { document.getElementById('paste-in').value = e.target.result; parseAndRender(); };
+  r.readAsText(input.files[0]);
+}
+function onDragOver(e) { e.preventDefault(); document.getElementById('drop-zone').classList.add('over'); }
+function onDragLeave() { document.getElementById('drop-zone').classList.remove('over'); }
+function onDrop(e) {
+  e.preventDefault(); document.getElementById('drop-zone').classList.remove('over');
+  if (e.dataTransfer.files[0]) {
+    const r = new FileReader();
+    r.onload = ev => { document.getElementById('paste-in').value = ev.target.result; parseAndRender(); };
+    r.readAsText(e.dataTransfer.files[0]);
+  }
+}
+
+// ── PARSE & RENDER ──
+function parseAndRender() {
+  setError('');
+  const text = document.getElementById('paste-in').value.trim();
+  if (!text) { setError('Collez ou téléversez un fichier CSV en premier.'); return; }
+
+  const rows = parseCSV(text);
+  if (rows.length < 2) { setError('Il faut au moins une ligne d\'en-tête et une ligne de données.'); return; }
+
+  headers = rows[0];
+  allRows = rows.slice(1).filter(r => r.some(c => c !== ''));
+  if (!allRows.length) { setError('Aucune ligne de données trouvée.'); return; }
+
+  // pad short rows
+  allRows = allRows.map(r => {
+    while (r.length < headers.length) r.push('');
+    return r;
+  });
+
+  visibleRows = [...allRows];
+  sortCol = -1; sortDir = 1;
+  currentTitle = document.getElementById('title-input').value.trim();
+
+  document.getElementById('search-input').value = '';
+  document.getElementById('header-meta').innerHTML =
+    `${headers.length} colonnes &nbsp;·&nbsp; ${allRows.length} rangées`;
+  document.getElementById('toolbar').style.display = 'flex';
+  document.getElementById('table-wrap').style.display = 'block';
+
+  renderTable('');
+}
+
+// ── IS NUMERIC ──
+function isNumericCol(colIdx) {
+  const sample = allRows.slice(0, 20).map(r => r[colIdx]).filter(v => v !== '');
+  return sample.length > 0 && sample.every(v => !isNaN(parseFloat(v)) && isFinite(v));
+}
+const numericCols = [];
+function computeNumericCols() {
+  numericCols.length = 0;
+  headers.forEach((_, ci) => { if (isNumericCol(ci)) numericCols.push(ci); });
+}
+
+// ── RENDER TABLE ──
+function renderTable(searchTerm) {
+  computeNumericCols();
+  const re = searchTerm ? new RegExp(searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi') : null;
+
+  let html = '<table class="data-table"><thead><tr>';
+  html += '<th class="num-col">#</th>';
+  headers.forEach((h, ci) => {
+    let cls = '';
+    if (ci === sortCol) cls = sortDir === 1 ? 'sort-asc' : 'sort-desc';
+    const arrow = ci === sortCol ? (sortDir === 1 ? '▲' : '▼') : '⬍';
+    html += `<th class="${cls}" onclick="sortBy(${ci})">${esc(h)}<span class="sort-icon">${arrow}</span></th>`;
+  });
+  html += '</tr></thead><tbody>';
+
+  visibleRows.forEach((row, ri) => {
+    html += '<tr>';
+    html += `<td class="num-col">${ri + 1}</td>`;
+    row.slice(0, headers.length).forEach((cell, ci) => {
+      const isNum = numericCols.includes(ci);
+      let display = esc(cell);
+      if (re && cell) {
+        display = cell.replace(re, m => `<mark>${esc(m)}</mark>`);
+      }
+      html += `<td class="${isNum ? 'is-num' : ''}" title="${esc(cell)}">${display || '<span style="color:var(--muted)">—</span>'}</td>`;
+    });
+    html += '</tr>';
+  });
+
+  if (!visibleRows.length) {
+    html += `<tr><td colspan="${headers.length + 1}" style="text-align:center;padding:3rem;color:var(--muted);font-size:12px">Aucune rangée ne correspond à votre recherche</td></tr>`;
+  }
+
+  html += '</tbody></table>';
+  document.getElementById('table-scroll').innerHTML = html;
+
+  const showing = searchTerm ? `${visibleRows.length} sur ${allRows.length}` : allRows.length;
+  document.getElementById('row-count').textContent = `${showing} rangées`;
+  document.getElementById('footer-left').textContent =
+    `${headers.length} colonnes · ${showing} rangées${currentTitle ? ' · ' + currentTitle : ''}`;
+}
+
+// ── SORT ──
+function sortBy(ci) {
+  if (sortCol === ci) { sortDir *= -1; }
+  else { sortCol = ci; sortDir = 1; }
+  const isNum = numericCols.includes(ci);
+  visibleRows.sort((a, b) => {
+    const av = a[ci] ?? '', bv = b[ci] ?? '';
+    if (isNum) return (parseFloat(av) - parseFloat(bv)) * sortDir;
+    return av.localeCompare(bv) * sortDir;
+  });
+  renderTable(document.getElementById('search-input').value);
+}
+
+// ── FILTER ──
+function filterRows(term) {
+  if (!term.trim()) {
+    visibleRows = [...allRows];
+  } else {
+    const lower = term.toLowerCase();
+    visibleRows = allRows.filter(row => row.some(cell => cell.toLowerCase().includes(lower)));
+  }
+  if (sortCol >= 0) {
+    const isNum = numericCols.includes(sortCol);
+    visibleRows.sort((a, b) => {
+      const av = a[sortCol] ?? '', bv = b[sortCol] ?? '';
+      if (isNum) return (parseFloat(av) - parseFloat(bv)) * sortDir;
+      return av.localeCompare(bv) * sortDir;
+    });
+  }
+  renderTable(term);
+}
+
+// ── PNG EXPORT ──
+function exportPNG() {
+  if (!headers.length) return;
+
+  const btn = document.getElementById('btn-export') || document.querySelector('button.export-btn');
+  const origText = btn.textContent;
+  btn.textContent = 'Rendering…';
+  btn.disabled = true;
+
+  setTimeout(() => {
+    try {
+      drawAndDownload();
+    } finally {
+      btn.textContent = origText;
+      btn.disabled = false;
+    }
+  }, 20);
+}
+
+function drawAndDownload() {
+  const SCALE       = 3;
+  const FONT        = `'Courier New', monospace`;
+  const FONT_SERIF  = `Georgia, serif`;
+
+  // layout constants (pre-scale)
+  const PAD         = 32;
+  const HEADER_ROW_H = 38;
+  const ROW_H       = 34;
+  const NUM_COL_W   = 44;
+  const CELL_PAD_H  = 14;
+  const CELL_PAD_V  = 10;
+  const MIN_COL_W   = 70;
+  const MAX_COL_W   = 240;
+  const TITLE_H     = currentTitle ? 60 : 0;
+  const FOOTER_H    = 36;
+  const FONT_CELL   = 11;
+  const FONT_HEAD   = 10;
+  const FONT_TITLE  = 18;
+  const FONT_META   = 10;
+
+  // measure column widths using a temp canvas
+  const tmp = document.createElement('canvas');
+  const tc = tmp.getContext('2d');
+  tc.font = `500 ${FONT_HEAD * SCALE}px ${FONT}`;
+
+  const colWidths = headers.map((h, ci) => {
+    let w = tc.measureText(h.toUpperCase()).width / SCALE + CELL_PAD_H * 2;
+    const sample = visibleRows.slice(0, 40);
+    tc.font = `400 ${FONT_CELL * SCALE}px ${FONT}`;
+    sample.forEach(row => {
+      const cell = row[ci] || '';
+      w = Math.max(w, tc.measureText(cell).width / SCALE + CELL_PAD_H * 2);
+    });
+    return Math.min(MAX_COL_W, Math.max(MIN_COL_W, w));
+  });
+
+  const totalColW = colWidths.reduce((s, w) => s + w, 0);
+  const canvasW = (PAD * 2 + NUM_COL_W + totalColW) * SCALE;
+  const canvasH = (PAD * 2 + TITLE_H + HEADER_ROW_H + visibleRows.length * ROW_H + FOOTER_H) * SCALE;
+
+  const canvas = document.createElement('canvas');
+  canvas.width  = canvasW;
+  canvas.height = canvasH;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(SCALE, SCALE);
+
+  const W = canvasW / SCALE;
+  const H = canvasH / SCALE;
+
+  // ── page background ──
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, W, H);
+
+  // ── title area ──
+  if (currentTitle) {
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(PAD, PAD, W - PAD * 2, TITLE_H - 8);
+
+    ctx.fillStyle = '#0f1c3f';
+    ctx.font = `300 ${FONT_TITLE}px ${FONT_SERIF}`;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(currentTitle, PAD + 12, PAD + TITLE_H * 0.38);
+
+    ctx.fillStyle = '#7d94bb';
+    ctx.font = `400 ${FONT_META}px ${FONT}`;
+    ctx.textBaseline = 'middle';
+    ctx.fillText(
+      `${headers.length} colonnes · ${visibleRows.length} rangées`,
+      PAD + 12, PAD + TITLE_H * 0.38 + FONT_TITLE + 6
+    );
+  }
+
+  const tableY = PAD + TITLE_H;
+  const tableW = W - PAD * 2;
+  const tableH = HEADER_ROW_H + visibleRows.length * ROW_H + FOOTER_H;
+
+  // ── table shadow / border ──
+  ctx.fillStyle = '#ffffff';
+  roundRect(ctx, PAD, tableY, tableW, tableH, 8);
+  ctx.fill();
+
+  // ── header row ──
+  ctx.fillStyle = '#1e3a6e';
+  roundRectTop(ctx, PAD, tableY, tableW, HEADER_ROW_H, 8);
+  ctx.fill();
+
+  // # col header
+  ctx.fillStyle = 'rgba(255,255,255,0.3)';
+  ctx.font = `400 ${FONT_HEAD}px ${FONT}`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('#', PAD + NUM_COL_W / 2, tableY + HEADER_ROW_H / 2);
+
+  // column headers
+  let cx = PAD + NUM_COL_W;
+  headers.forEach((h, ci) => {
+    // separator line
+    ctx.fillStyle = 'rgba(255,255,255,0.08)';
+    ctx.fillRect(cx, tableY + 8, 1, HEADER_ROW_H - 16);
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = `500 ${FONT_HEAD}px ${FONT}`;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    const label = h.toUpperCase();
+    const maxW = colWidths[ci] - CELL_PAD_H * 2;
+    ctx.fillText(truncateText(ctx, label, maxW), cx + CELL_PAD_H, tableY + HEADER_ROW_H / 2);
+    cx += colWidths[ci];
+  });
+
+  // ── data rows ──
+  visibleRows.forEach((row, ri) => {
+    const ry = tableY + HEADER_ROW_H + ri * ROW_H;
+    const isOdd = ri % 2 === 0;
+
+    // row bg
+    ctx.fillStyle = isOdd ? '#f8faff' : '#ffffff';
+    if (ri === visibleRows.length - 1) {
+      roundRectBottom(ctx, PAD, ry, tableW, ROW_H, 0);
+    } else {
+      ctx.fillRect(PAD, ry, tableW, ROW_H);
+    }
+
+    // row border
+    ctx.strokeStyle = '#dae3f5';
+    ctx.lineWidth = 0.5;
+    ctx.beginPath();
+    ctx.moveTo(PAD, ry + ROW_H);
+    ctx.lineTo(PAD + tableW, ry + ROW_H);
+    ctx.stroke();
+
+    // row number
+    ctx.fillStyle = '#7d94bb';
+    ctx.font = `400 ${FONT_META}px ${FONT}`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(ri + 1, PAD + NUM_COL_W / 2, ry + ROW_H / 2);
+
+    // num col separator
+    ctx.strokeStyle = '#dae3f5';
+    ctx.lineWidth = 0.5;
+    ctx.beginPath();
+    ctx.moveTo(PAD + NUM_COL_W, ry);
+    ctx.lineTo(PAD + NUM_COL_W, ry + ROW_H);
+    ctx.stroke();
+
+    // cells
+    let cellX = PAD + NUM_COL_W;
+    row.slice(0, headers.length).forEach((cell, ci) => {
+      const isNum = numericCols.includes(ci);
+      const maxW = colWidths[ci] - CELL_PAD_H * 2;
+
+      ctx.fillStyle = isNum ? '#1e3a6e' : '#0f1c3f';
+      ctx.font = `400 ${FONT_CELL}px ${FONT}`;
+      ctx.textAlign = isNum ? 'right' : 'left';
+      ctx.textBaseline = 'middle';
+
+      const display = cell || '—';
+      const tx = isNum ? cellX + colWidths[ci] - CELL_PAD_H : cellX + CELL_PAD_H;
+      ctx.fillText(truncateText(ctx, display, maxW), tx, ry + ROW_H / 2);
+
+      // col separator
+      ctx.strokeStyle = '#dae3f5';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(cellX + colWidths[ci], ry);
+      ctx.lineTo(cellX + colWidths[ci], ry + ROW_H);
+      ctx.stroke();
+
+      cellX += colWidths[ci];
+    });
+  });
+
+  // ── footer ──
+  const footerY = tableY + HEADER_ROW_H + visibleRows.length * ROW_H;
+  ctx.fillStyle = '#eff6ff';
+  roundRectBottom(ctx, PAD, footerY, tableW, FOOTER_H, 8);
+  ctx.fill();
+  ctx.strokeStyle = '#dae3f5';
+  ctx.lineWidth = 0.5;
+  ctx.beginPath();
+  ctx.moveTo(PAD, footerY);
+  ctx.lineTo(PAD + tableW, footerY);
+  ctx.stroke();
+
+  ctx.fillStyle = '#7d94bb';
+  ctx.font = `400 ${FONT_META}px ${FONT}`;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(
+    `${headers.length} colonnes · ${visibleRows.length} rangées`,
+    PAD + 14, footerY + FOOTER_H / 2
+  );
+  ctx.textAlign = 'right';
+  ctx.fillText('tri de cartes · tableau', PAD + tableW - 14, footerY + FOOTER_H / 2);
+
+  // ── table outline ──
+  ctx.strokeStyle = '#c3d4ee';
+  ctx.lineWidth = 1;
+  roundRect(ctx, PAD, tableY, tableW, tableH, 8);
+  ctx.stroke();
+
+  // ── download ──
+  canvas.toBlob(blob => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = (currentTitle || 'table') + '.png';
+    a.click();
+    URL.revokeObjectURL(url);
+  }, 'image/png');
+}
+
+// ── CANVAS HELPERS ──
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.arcTo(x + w, y, x + w, y + r, r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+  ctx.lineTo(x + r, y + h);
+  ctx.arcTo(x, y + h, x, y + h - r, r);
+  ctx.lineTo(x, y + r);
+  ctx.arcTo(x, y, x + r, y, r);
+  ctx.closePath();
+}
+function roundRectTop(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.arcTo(x + w, y, x + w, y + r, r);
+  ctx.lineTo(x + w, y + h);
+  ctx.lineTo(x, y + h);
+  ctx.lineTo(x, y + r);
+  ctx.arcTo(x, y, x + r, y, r);
+  ctx.closePath();
+}
+function roundRectBottom(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.lineTo(x + w, y);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+  ctx.lineTo(x + r, y + h);
+  ctx.arcTo(x, y + h, x, y + h - r, r);
+  ctx.lineTo(x, y);
+  ctx.closePath();
+}
+function truncateText(ctx, text, maxW) {
+  if (ctx.measureText(text).width <= maxW) return text;
+  let t = text;
+  while (t.length > 1 && ctx.measureText(t + '…').width > maxW) t = t.slice(0, -1);
+  return t + '…';
+}
+
+// ── SAMPLE ──
+function loadSample() {
+  document.getElementById('title-input').value = 'Card Sort Results';
+  document.getElementById('paste-in').value =
+`card,Navigation,Account,Shopping,Support,Information,Total
+Homepage,24,3,6,2,10,45
+Search,20,2,18,1,8,49
+Product page,3,1,26,1,14,45
+Cart,2,2,28,3,3,38
+Checkout,1,2,27,5,2,37
+My account,3,26,5,7,4,45
+Order history,2,22,12,8,5,49
+Wishlist,2,5,24,2,5,38
+Help center,2,3,2,28,8,43
+Returns,1,4,8,24,5,42
+Contact us,1,2,3,27,6,39
+About us,4,1,2,6,24,37`;
+  parseAndRender();
+}
+
+function setError(msg) { document.getElementById('error-msg').textContent = msg; }
+function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+</script>
+</body>
+</html>
