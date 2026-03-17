@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tri de cartes · Clusters 3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Fraunces:ital,opsz,wght@0,9..144,200;0,9..144,300;1,9..144,200;1,9..144,300&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #f5f3ee;
+  --surface: #ffffff;
+  --border: rgba(0,0,0,0.08);
+  --border2: rgba(0,0,0,0.14);
+  --text: #1a1814;
+  --muted: #8a8680;
+  --accent: #2d4a3e;
+
+  --c1: #2d6a4f; /* Fonctionnement */
+  --c2: #1d3557; /* Identité */
+  --c3: #c77dff; /* Contact */
+  --c4: #e07a5f; /* Participation */
+  --c5: #f4a261; /* Actualités */
+  --c6: #adb5bd; /* Orphelins */
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 1.5rem 2rem 1rem;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  pointer-events: none;
+}
+
+header h1 {
+  font-family: 'Fraunces', serif;
+  font-weight: 200;
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+header h1 em { font-style: italic; color: var(--accent); }
+
+.header-meta {
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: right;
+  line-height: 1.8;
+}
+
+#canvas-wrap {
+  position: fixed;
+  inset: 0;
+  cursor: grab;
+}
+#canvas-wrap:active { cursor: grabbing; }
+canvas { width: 100%; height: 100%; display: block; }
+
+/* Legend */
+#legend {
+  position: fixed;
+  bottom: 2rem;
+  left: 2rem;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  min-width: 200px;
+  z-index: 100;
+}
+.legend-title {
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.75rem;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 5px;
+  font-size: 11px;
+  color: var(--text);
+  cursor: pointer;
+  opacity: 1;
+  transition: opacity 0.2s;
+}
+.legend-item.dimmed { opacity: 0.3; }
+.legend-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.legend-count {
+  margin-left: auto;
+  font-size: 10px;
+  color: var(--muted);
+}
+
+/* Controls */
+#controls {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 100;
+}
+.ctrl-btn {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  padding: 0.45rem 0.9rem;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  color: var(--text);
+  transition: all 0.15s;
+}
+.ctrl-btn:hover { border-color: var(--accent); color: var(--accent); }
+.ctrl-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* Tooltip */
+#tooltip {
+  position: fixed;
+  pointer-events: none;
+  z-index: 200;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 11px;
+  display: none;
+  max-width: 220px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+.tt-name {
+  font-family: 'Fraunces', serif;
+  font-weight: 300;
+  font-size: 13px;
+  margin-bottom: 3px;
+  color: var(--text);
+}
+.tt-cluster {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.tt-sim {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* Hint */
+#hint {
+  position: fixed;
+  top: 50%;
+  right: 2rem;
+  transform: translateY(-50%);
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  opacity: 0.5;
+  pointer-events: none;
+  user-select: none;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Tri de cartes<br><em>Clusters 3D</em></h1>
+  <div class="header-meta">
+    27 cartes &nbsp;·&nbsp; 10 catégories &nbsp;·&nbsp; N = 23<br>
+    PCA sur matrice de similarité · liaison moyenne
+  </div>
+</header>
+
+<div id="legend" style="display:none">
+  <div class="legend-title">Groupes</div>
+</div>
+
+<div id="canvas-wrap">
+  <canvas id="c"></canvas>
+</div>
+
+
+
+<div id="controls">
+  <button class="ctrl-btn active" id="btn-rotate" onclick="toggleRotate(this)">⟳ Auto-rotation</button>
+  <button class="ctrl-btn" onclick="resetView()">Réinitialiser la vue</button>
+
+</div>
+
+<div id="tooltip"></div>
+<div id="hint">Glisser pour pivoter · Molette pour zoomer</div>
+
+<script>
+// ── DATA ──
+// Similarity matrix (cosine, pre-computed from CSV, N=23)
+const cards = [
+  "Blogue","Calendrier des cueillettes","Calendrier des récoltes",
+  "Conditions de participation","Contact","Courriel",
+  "Devenir chef de cueillette","Évènements","Faire un don","FAQ",
+  "Fonctionnement d'une cueillette","forum communautaire",
+  "Guide d'entretien des arbres","Guide de récolte des fruits",
+  "Inscription à l'infolettre","inscription à l'infolettre x2",
+  "Inscrire mon arbre","Instructions pour les bénévoles","Mission",
+  "Notre équipe","Notre impact","Nouvelles",
+  "Participer à une cueillette","Répartition des fruits",
+  "Réseaux sociaux","Témoignages","Valeurs du collectif"
+];
+
+const N = 23;
+const rawVectors = [
+  [0,1,0,0,0,0,0,0,0,0],
+  [0,17,1,0,0,0,2,0,0,3],
+  [0,16,1,0,0,0,4,0,0,2],
+  [10,0,0,0,0,0,10,0,0,3],
+  [0,0,0,23,0,0,0,0,0,0],
+  [0,0,0,23,0,0,0,0,0,0],
+  [0,0,0,0,0,0,3,0,0,20],
+  [0,23,0,0,0,0,0,0,0,0],
+  [2,0,0,4,3,0,0,0,0,13],
+  [11,2,0,2,0,1,7,0,0,0],
+  [2,0,0,0,0,0,20,0,0,1],
+  [0,0,0,0,0,0,0,0,1,0],
+  [2,1,0,0,0,1,17,1,0,1],
+  [2,1,0,0,0,1,16,1,0,2],
+  [3,6,0,9,0,0,0,0,0,5],
+  [0,1,0,0,0,0,0,0,0,0],
+  [1,0,0,1,0,0,0,0,0,21],
+  [3,0,0,0,0,0,16,0,0,3],
+  [16,1,0,0,0,0,3,0,0,3],
+  [20,0,0,2,0,0,1,0,0,0],
+  [21,0,0,0,0,0,1,0,0,1],
+  [0,1,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,23],
+  [0,1,0,0,0,0,18,0,0,4],
+  [0,4,0,19,0,0,0,0,0,0],
+  [0,0,0,0,0,0,1,0,0,0],
+  [18,0,0,0,0,0,3,0,0,2]
+];
+
+// Compute cosine similarity matrix
+function cosineSim(a, b) {
+  let dot = 0, na = 0, nb = 0;
+  for (let i = 0; i < a.length; i++) { dot += a[i]*b[i]; na += a[i]*a[i]; nb += b[i]*b[i]; }
+  if (na === 0 || nb === 0) return 0;
+  return dot / (Math.sqrt(na) * Math.sqrt(nb));
+}
+const n = cards.length;
+const sim = Array.from({length:n}, (_,i) => Array.from({length:n}, (_,j) => cosineSim(rawVectors[i], rawVectors[j])));
+
+// ── PCA (3D) on similarity matrix ──
+function mean(arr) { return arr.reduce((s,v)=>s+v,0)/arr.length; }
+
+function pca3(matrix) {
+  const rows = matrix.length, cols = matrix[0].length;
+  // Center columns
+  const colMeans = Array.from({length:cols}, (_,j) => mean(matrix.map(r=>r[j])));
+  const X = matrix.map(r => r.map((v,j) => v - colMeans[j]));
+
+  // Covariance matrix (cols × cols)
+  const cov = Array.from({length:cols}, (_,i) =>
+    Array.from({length:cols}, (_,j) => {
+      let s = 0;
+      for (let r=0; r<rows; r++) s += X[r][i]*X[r][j];
+      return s/(rows-1);
+    })
+  );
+
+  // Power iteration for top 3 eigenvectors
+  function powerIter(C, exclude) {
+    let v = Array.from({length:cols}, () => Math.random()-0.5);
+    // Orthogonalize against excluded
+    for (const e of exclude) {
+      const d = v.reduce((s,vi,i)=>s+vi*e[i],0);
+      v = v.map((vi,i)=>vi-d*e[i]);
+    }
+    // Normalize
+    let norm = Math.sqrt(v.reduce((s,vi)=>s+vi*vi,0));
+    v = v.map(vi=>vi/norm);
+
+    for (let iter=0; iter<200; iter++) {
+      let nv = Array(cols).fill(0);
+      for (let i=0;i<cols;i++) for (let j=0;j<cols;j++) nv[i]+=C[i][j]*v[j];
+      // Orthogonalize
+      for (const e of exclude) {
+        const d = nv.reduce((s,vi,i)=>s+vi*e[i],0);
+        nv = nv.map((vi,i)=>vi-d*e[i]);
+      }
+      norm = Math.sqrt(nv.reduce((s,vi)=>s+vi*vi,0));
+      if (norm < 1e-10) break;
+      nv = nv.map(vi=>vi/norm);
+      const diff = Math.sqrt(nv.reduce((s,vi,i)=>s+(vi-v[i])*(vi-v[i]),0));
+      v = nv;
+      if (diff < 1e-8) break;
+    }
+    return v;
+  }
+
+  const e1 = powerIter(cov, []);
+  const e2 = powerIter(cov, [e1]);
+  const e3 = powerIter(cov, [e1, e2]);
+
+  // Project rows
+  return X.map(row => [
+    row.reduce((s,v,i)=>s+v*e1[i],0),
+    row.reduce((s,v,i)=>s+v*e2[i],0),
+    row.reduce((s,v,i)=>s+v*e3[i],0)
+  ]);
+}
+
+const coords3d = pca3(sim);
+
+// Normalize to [-1, 1]
+for (let d=0; d<3; d++) {
+  const vals = coords3d.map(p=>p[d]);
+  const mn = Math.min(...vals), mx = Math.max(...vals);
+  const rng = mx-mn || 1;
+  coords3d.forEach(p => p[d] = ((p[d]-mn)/rng)*2-1);
+}
+
+// ── CLUSTER ASSIGNMENTS ──
+const clusterDefs = [
+  { name: "Fonctionnement", color: "#2d6a4f", cards: ["Fonctionnement d'une cueillette","Guide d'entretien des arbres","Guide de récolte des fruits","Instructions pour les bénévoles","Répartition des fruits"] },
+  { name: "Identité", color: "#1d3557", cards: ["Mission","Valeurs du collectif","Notre équipe","Notre impact","Conditions de participation","FAQ"] },
+  { name: "Contact & réseaux", color: "#9b5de5", cards: ["Contact","Courriel","Réseaux sociaux","Inscription à l'infolettre"] },
+  { name: "Participation", color: "#e07a5f", cards: ["Devenir chef de cueillette","Inscrire mon arbre","Participer à une cueillette","Faire un don"] },
+  { name: "Actualités", color: "#e9a84c", cards: ["Calendrier des cueillettes","Calendrier des récoltes","Évènements"] },
+  { name: "Orphelins", color: "#a0998e", cards: ["Blogue","inscription à l'infolettre x2","Nouvelles","Témoignages","forum communautaire"] }
+];
+
+const cardCluster = {};
+const cardColor = {};
+clusterDefs.forEach(cl => {
+  cl.cards.forEach(c => { cardCluster[c] = cl.name; cardColor[c] = cl.color; });
+});
+
+// ── BUILD LEGEND ──
+const legendEl = document.getElementById('legend');
+clusterDefs.forEach((cl, ci) => {
+  const item = document.createElement('div');
+  item.className = 'legend-item';
+  item.dataset.cluster = cl.name;
+  item.innerHTML = `<div class="legend-dot" style="background:${cl.color}"></div>
+    <span>${cl.name}</span>
+    <span class="legend-count">${cl.cards.length}</span>`;
+  item.addEventListener('click', () => toggleCluster(cl.name, item));
+  legendEl.appendChild(item);
+});
+
+// ── 3D RENDERER ──
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+
+let rotX = 0.3, rotY = 0.5;
+let targetRotX = rotX, targetRotY = rotY;
+let zoom = 1;
+let autoRotate = true;
+let dragging = false, lastMX = 0, lastMY = 0;
+let hoveredIdx = -1;
+let hiddenClusters = new Set();
+const RADIUS = 7;
+
+function resize() {
+  canvas.width = window.innerWidth * devicePixelRatio;
+  canvas.height = window.innerHeight * devicePixelRatio;
+}
+window.addEventListener('resize', () => { resize(); });
+resize();
+
+function project(p3, cx, cy, scale) {
+  const cosX = Math.cos(rotX), sinX = Math.sin(rotX);
+  const cosY = Math.cos(rotY), sinY = Math.sin(rotY);
+
+  let x = p3[0], y = p3[1], z = p3[2];
+  // Rotate Y
+  let tx = x*cosY + z*sinY, tz = -x*sinY + z*cosY;
+  x = tx; z = tz;
+  // Rotate X
+  let ty = y*cosX - z*sinX, tz2 = y*sinX + z*cosX;
+  y = ty; z = tz2;
+
+  const fov = 2.5;
+  const w = fov / (fov + z);
+  return { sx: cx + x*scale*w, sy: cy + y*scale*w, z, w };
+}
+
+let animFrame;
+let lastTime = 0;
+
+function draw(time) {
+  animFrame = requestAnimationFrame(draw);
+  const dt = Math.min((time - lastTime)/1000, 0.05);
+  lastTime = time;
+
+  if (autoRotate && !dragging) {
+    rotY += 0.004;
+    targetRotY = rotY;
+  }
+
+  // Smooth lerp
+  rotX += (targetRotX - rotX) * 0.12;
+  rotY += (targetRotY - rotY) * 0.12;
+
+  const dpr = devicePixelRatio;
+  const W = canvas.width / dpr, H = canvas.height / dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, W, H);
+
+  const cx = W/2, cy = H/2;
+  const scale = Math.min(W, H) * 0.32 * zoom;
+
+  // Compute projected positions & depth-sort
+  const pts = coords3d.map((p, i) => {
+    const proj = project(p, cx, cy, scale);
+    return { i, proj, color: cardColor[cards[i]] || '#aaa', name: cards[i], cluster: cardCluster[cards[i]] };
+  });
+  pts.sort((a,b) => a.proj.z - b.proj.z);
+
+  // Draw grid / axes (subtle)
+  const axisLen = scale * 0.85;
+  const origin = project([0,0,0], cx, cy, scale);
+  const axes = [
+    { dir: [1,0,0], label:'PC1', color:'rgba(180,60,60,0.25)' },
+    { dir: [0,1,0], label:'PC2', color:'rgba(60,120,180,0.25)' },
+    { dir: [0,0,1], label:'PC3', color:'rgba(60,160,100,0.25)' }
+  ];
+  axes.forEach(ax => {
+    const end = project(ax.dir.map(v=>v*0.9), cx, cy, scale);
+    ctx.beginPath();
+    ctx.moveTo(origin.sx, origin.sy);
+    ctx.lineTo(end.sx, end.sy);
+    ctx.strokeStyle = ax.color;
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3,4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  // Draw edges between nearby points (within same cluster)
+  pts.forEach(a => {
+    if (hiddenClusters.has(a.cluster)) return;
+    pts.forEach(b => {
+      if (b.i <= a.i) return;
+      if (a.cluster !== b.cluster || hiddenClusters.has(b.cluster)) return;
+      const s = sim[a.i][b.i];
+      if (s < 0.55) return;
+      const alpha = (s - 0.55) / 0.45 * 0.18;
+      ctx.beginPath();
+      ctx.moveTo(a.proj.sx, a.proj.sy);
+      ctx.lineTo(b.proj.sx, b.proj.sy);
+      ctx.strokeStyle = a.color + Math.round(alpha*255).toString(16).padStart(2,'0');
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    });
+  });
+
+  // Draw points
+  pts.forEach(pt => {
+    const { sx, sy, w } = pt.proj;
+    const isHovered = pt.i === hoveredIdx;
+    const hidden = hiddenClusters.has(pt.cluster);
+
+    const r = (RADIUS + (isHovered ? 3 : 0)) * w * 1.4;
+    ctx.globalAlpha = hidden ? 0.08 : (isHovered ? 1 : 0.88);
+
+    // Shadow for depth
+    if (!hidden) {
+      ctx.beginPath();
+      ctx.arc(sx + 1.5, sy + 2, r, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(0,0,0,0.12)';
+      ctx.fill();
+    }
+
+    // Main dot
+    ctx.beginPath();
+    ctx.arc(sx, sy, r, 0, Math.PI*2);
+    ctx.fillStyle = pt.color;
+    ctx.fill();
+
+    if (isHovered) {
+      ctx.beginPath();
+      ctx.arc(sx, sy, r+2.5, 0, Math.PI*2);
+      ctx.strokeStyle = pt.color;
+      ctx.lineWidth = 1.5;
+      ctx.globalAlpha = 0.4;
+      ctx.stroke();
+    }
+
+    ctx.globalAlpha = 1;
+
+    // Label
+    if (!hidden && (isHovered || w > 0.72)) {
+      const label = pt.name.length > 22 ? pt.name.slice(0,21)+'…' : pt.name;
+      ctx.font = `${isHovered ? 500 : 400} ${isHovered ? 11 : 9.5}px 'Courier New', monospace`;
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      const lx = sx + r + 4, ly = sy;
+      // Background pill
+      const tw = ctx.measureText(label).width;
+      ctx.fillStyle = 'rgba(245,243,238,0.88)';
+      ctx.beginPath();
+      ctx.roundRect(lx - 2, ly - 7, tw + 6, 14, 3);
+      ctx.fill();
+      ctx.fillStyle = isHovered ? '#1a1814' : 'rgba(30,28,24,0.65)';
+      ctx.fillText(label, lx, ly);
+    }
+  });
+}
+
+// ── INTERACTION ──
+function getHovered(mx, my) {
+  const dpr = devicePixelRatio;
+  const W = canvas.width/dpr, H = canvas.height/dpr;
+  const cx = W/2, cy = H/2;
+  const scale = Math.min(W,H)*0.32*zoom;
+  let best = -1, bestD = 20;
+  coords3d.forEach((p, i) => {
+    if (hiddenClusters.has(cardCluster[cards[i]])) return;
+    const proj = project(p, cx, cy, scale);
+    const r = RADIUS * proj.w * 1.4;
+    const d = Math.hypot(mx - proj.sx, my - proj.sy);
+    if (d < r + 8 && d < bestD) { bestD = d; best = i; }
+  });
+  return best;
+}
+
+canvas.addEventListener('mousemove', e => {
+  const rect = canvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+  hoveredIdx = getHovered(mx, my);
+
+  const tip = document.getElementById('tooltip');
+  if (hoveredIdx >= 0 && !dragging) {
+    const c = cards[hoveredIdx];
+    const cl = cardCluster[c];
+    const col = cardColor[c];
+    // top 3 most similar cards
+    const sims = sim[hoveredIdx].map((s,i)=>({i,s})).filter(x=>x.i!==hoveredIdx).sort((a,b)=>b.s-a.s).slice(0,3);
+    const simHtml = sims.map(x=>`<span style="color:${cardColor[cards[x.i]]||'#888'}">${cards[x.i]}</span> ${Math.round(x.s*100)}%`).join('<br>');
+    tip.innerHTML = `<div class="tt-name">${c}</div>
+      <div class="tt-cluster" style="color:${col}">${cl}</div>
+      <div class="tt-sim">Plus similaire à :<br>${simHtml}</div>`;
+    tip.style.display = 'block';
+    tip.style.left = (e.clientX + 14) + 'px';
+    tip.style.top  = (e.clientY - 14) + 'px';
+    canvas.style.cursor = 'pointer';
+  } else {
+    tip.style.display = 'none';
+    canvas.style.cursor = dragging ? 'grabbing' : 'grab';
+  }
+
+  if (dragging) {
+    const dx = mx - lastMX, dy = my - lastMY;
+    targetRotY += dx * 0.008;
+    targetRotX += dy * 0.008;
+    targetRotX = Math.max(-Math.PI/2, Math.min(Math.PI/2, targetRotX));
+    rotY = targetRotY;
+    rotX = targetRotX;
+    lastMX = mx; lastMY = my;
+  }
+});
+
+canvas.addEventListener('mousedown', e => {
+  dragging = true;
+  lastMX = e.clientX - canvas.getBoundingClientRect().left;
+  lastMY = e.clientY - canvas.getBoundingClientRect().top;
+});
+window.addEventListener('mouseup', () => { dragging = false; });
+canvas.addEventListener('mouseleave', () => {
+  hoveredIdx = -1;
+  document.getElementById('tooltip').style.display = 'none';
+});
+
+canvas.addEventListener('wheel', e => {
+  e.preventDefault();
+  zoom *= e.deltaY > 0 ? 0.93 : 1.07;
+  zoom = Math.max(0.4, Math.min(3, zoom));
+}, { passive: false });
+
+// Touch support
+let lastTouchDist = 0;
+canvas.addEventListener('touchstart', e => {
+  if (e.touches.length === 1) {
+    dragging = true;
+    lastMX = e.touches[0].clientX;
+    lastMY = e.touches[0].clientY;
+  }
+  if (e.touches.length === 2) {
+    lastTouchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+  }
+}, { passive: true });
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if (e.touches.length === 1 && dragging) {
+    const dx = e.touches[0].clientX - lastMX, dy = e.touches[0].clientY - lastMY;
+    targetRotY += dx * 0.008; targetRotX += dy * 0.008;
+    rotY = targetRotY; rotX = targetRotX;
+    lastMX = e.touches[0].clientX; lastMY = e.touches[0].clientY;
+  }
+  if (e.touches.length === 2) {
+    const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+    zoom *= d / lastTouchDist; zoom = Math.max(0.4, Math.min(3, zoom));
+    lastTouchDist = d;
+  }
+}, { passive: false });
+canvas.addEventListener('touchend', () => { dragging = false; });
+
+function toggleRotate(btn) {
+  autoRotate = !autoRotate;
+  btn.classList.toggle('active', autoRotate);
+}
+
+function resetView() {
+  targetRotX = 0.3; targetRotY = 0.5; zoom = 1;
+}
+
+function toggleCluster(name, el) {
+  if (hiddenClusters.has(name)) {
+    hiddenClusters.delete(name);
+    el.classList.remove('dimmed');
+  } else {
+    hiddenClusters.add(name);
+    el.classList.add('dimmed');
+  }
+}
+
+// ── HD PNG EXPORT ──
+function exportPNG(btn) {
+  const origText = btn.textContent;
+  btn.textContent = 'Génération…';
+  btn.disabled = true;
+
+  // Pause auto-rotation during export snapshot
+  const wasRotating = autoRotate;
+  autoRotate = false;
+
+  setTimeout(() => {
+    try {
+      renderAndDownload();
+    } finally {
+      autoRotate = wasRotating;
+      btn.textContent = origText;
+      btn.disabled = false;
+    }
+  }, 60);
+}
+
+function renderAndDownload() {
+  const SCALE = 4;
+  const EW = 1920, EH = 1080;
+  const FONT = "'Courier New', monospace";
+
+  const exp = document.createElement('canvas');
+  exp.width  = EW * SCALE;
+  exp.height = EH * SCALE;
+  const ec = exp.getContext('2d');
+  ec.scale(SCALE, SCALE);
+
+  // White background
+  ec.fillStyle = '#ffffff';
+  ec.fillRect(0, 0, EW, EH);
+
+  // Subtle grid dot pattern for texture
+  ec.fillStyle = 'rgba(0,0,0,0.03)';
+  for (let gx = 20; gx < EW; gx += 28) {
+    for (let gy = 20; gy < EH; gy += 28) {
+      ec.beginPath(); ec.arc(gx, gy, 1, 0, Math.PI*2); ec.fill();
+    }
+  }
+
+  const cx = EW / 2 + 60, cy = EH / 2 + 10;
+  const scale = Math.min(EW, EH) * 0.34 * zoom;
+
+  // Project using current rotation state
+  function proj(p3) {
+    const cosX = Math.cos(rotX), sinX = Math.sin(rotX);
+    const cosY = Math.cos(rotY), sinY = Math.sin(rotY);
+    let x = p3[0], y = p3[1], z = p3[2];
+    let tx = x*cosY + z*sinY, tz = -x*sinY + z*cosY;
+    x = tx; z = tz;
+    let ty = y*cosX - z*sinX, tz2 = y*sinX + z*cosX;
+    y = ty; z = tz2;
+    const fov = 2.5;
+    const w = fov / (fov + z);
+    return { sx: cx + x*scale*w, sy: cy + y*scale*w, z, w };
+  }
+
+  // Axes
+  const origin = proj([0,0,0]);
+  [
+    { dir:[1,0,0], color:'rgba(200,80,80,0.2)' },
+    { dir:[0,1,0], color:'rgba(80,120,200,0.2)' },
+    { dir:[0,0,1], color:'rgba(80,180,120,0.2)' }
+  ].forEach(ax => {
+    const end = proj(ax.dir.map(v=>v*0.9));
+    ec.beginPath(); ec.moveTo(origin.sx, origin.sy); ec.lineTo(end.sx, end.sy);
+    ec.strokeStyle = ax.color; ec.lineWidth = 1; ec.setLineDash([3,4]); ec.stroke();
+    ec.setLineDash([]);
+  });
+
+  // Build sorted points
+  const pts = coords3d.map((p, i) => {
+    const p3 = proj(p);
+    return { i, proj: p3, color: cardColor[cards[i]] || '#aaa', name: cards[i], cluster: cardCluster[cards[i]] };
+  }).sort((a,b) => a.proj.z - b.proj.z);
+
+  // Edges within clusters
+  pts.forEach(a => {
+    pts.forEach(b => {
+      if (b.i <= a.i || a.cluster !== b.cluster) return;
+      const s = sim[a.i][b.i];
+      if (s < 0.55) return;
+      const alpha = (s - 0.55) / 0.45 * 0.22;
+      const hex = Math.round(alpha * 255).toString(16).padStart(2,'0');
+      ec.beginPath();
+      ec.moveTo(a.proj.sx, a.proj.sy);
+      ec.lineTo(b.proj.sx, b.proj.sy);
+      ec.strokeStyle = a.color + hex;
+      ec.lineWidth = 1.2;
+      ec.stroke();
+    });
+  });
+
+  // Points + labels
+  pts.forEach(pt => {
+    const { sx, sy, w } = pt.proj;
+    const r = 7 * w * 1.5;
+
+    // Shadow
+    ec.beginPath(); ec.arc(sx+2, sy+2.5, r, 0, Math.PI*2);
+    ec.fillStyle = 'rgba(0,0,0,0.10)'; ec.fill();
+
+    // Dot
+    ec.beginPath(); ec.arc(sx, sy, r, 0, Math.PI*2);
+    ec.fillStyle = pt.color; ec.fill();
+
+    // White ring
+    ec.beginPath(); ec.arc(sx, sy, r, 0, Math.PI*2);
+    ec.strokeStyle = 'rgba(255,255,255,0.6)'; ec.lineWidth = 1; ec.stroke();
+
+    // Label
+    const label = pt.name;
+    ec.font = `400 10px ${FONT}`;
+    ec.textAlign = 'left'; ec.textBaseline = 'middle';
+    const lx = sx + r + 5, ly = sy;
+    const tw = ec.measureText(label).width;
+    ec.fillStyle = 'rgba(255,255,255,0.82)';
+    ec.beginPath(); ec.roundRect(lx - 2, ly - 7, tw + 6, 14, 3); ec.fill();
+    ec.fillStyle = '#1a1814';
+    ec.fillText(label, lx, ly);
+  });
+
+  // ── Title block (top-left) ──
+  ec.font = `300 28px 'Georgia', serif`;
+  ec.fillStyle = '#1a1814'; ec.textAlign = 'left'; ec.textBaseline = 'top';
+  ec.fillText('Tri de cartes', 48, 38);
+  ec.font = `300 italic 28px 'Georgia', serif`;
+  ec.fillStyle = '#2d4a3e';
+  ec.fillText('Clusters 3D', 48 + ec.measureText('Tri de cartes  ').width - 14, 38);
+
+  ec.font = `400 10px ${FONT}`;
+  ec.fillStyle = '#8a8680';
+  ec.fillText('27 CARTES  ·  10 CATÉGORIES  ·  N = 23  ·  PCA SUR MATRICE DE SIMILARITÉ', 48, 76);
+
+  // ── Legend block (bottom-left) ──
+  const LX = 48, LY = EH - 48 - clusterDefs.length * 22 - 20;
+  ec.font = `400 9px ${FONT}`;
+  ec.fillStyle = '#8a8680'; ec.letterSpacing = '0.12em';
+  ec.fillText('GROUPES', LX, LY);
+  ec.letterSpacing = '0';
+
+  clusterDefs.forEach((cl, i) => {
+    const ly2 = LY + 18 + i * 22;
+    // dot
+    ec.beginPath(); ec.arc(LX + 5, ly2 + 5, 5, 0, Math.PI*2);
+    ec.fillStyle = cl.color; ec.fill();
+    // label
+    ec.font = `400 11px ${FONT}`;
+    ec.fillStyle = '#1a1814'; ec.textAlign = 'left'; ec.textBaseline = 'top';
+    ec.fillText(`${cl.name}  (${cl.cards.length})`, LX + 16, ly2);
+  });
+
+  // ── Download ──
+  exp.toBlob(blob => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'clusters-3d.png';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }, 'image/png');
+}
+
+requestAnimationFrame(draw);
+</script>
+</body>
+</html>
