@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
@@ -197,6 +197,61 @@
       border-color: #ccc;
     }
 
+    /* ── Scale 1–10 ── */
+    .scale-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .scale-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: nowrap;
+    }
+
+    .scale-btn {
+      flex: 1;
+      min-width: 0;
+      aspect-ratio: 1;
+      background: #f7f7f7;
+      border: 1.5px solid transparent;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: #444;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+
+    .scale-btn:hover {
+      border-color: #ccc;
+    }
+
+    .scale-btn.selected {
+      background: #111;
+      border-color: #111;
+      color: #fff;
+    }
+
+    .scale-labels {
+      display: flex;
+      justify-content: space-between;
+      padding: 0 2px;
+    }
+
+    .scale-label-text {
+      font-size: 11px;
+      color: #aaa;
+      font-weight: 500;
+    }
+
     /* Required asterisk */
     .required-mark {
       color: #e05555;
@@ -217,6 +272,15 @@
 
     .question-block.has-error textarea {
       border-color: #e05555;
+    }
+
+    .question-block.has-error .scale-btn:not(.selected) {
+      border-color: transparent;
+    }
+
+    .question-block.has-error .scale-buttons {
+      outline: 1.5px solid #e05555;
+      border-radius: 8px;
     }
 
     /* ── Submit ── */
@@ -298,6 +362,11 @@
       .radio-option label {
         width: 100%;
         justify-content: flex-start;
+      }
+
+      .scale-btn {
+        font-size: 12px;
+        border-radius: 6px;
       }
     }
   </style>
@@ -406,17 +475,40 @@
       <span class="field-error">Cette question est obligatoire.</span>
     </div>
 
-    <!-- Q6: Text area -->
+    <!-- Q6: Scale + Text area -->
     <div class="question-block" id="block-6">
       <span class="question-number">Question 6</span>
-      <label class="question-label" for="q6">
-        Trouve-tu que la marque est authentique? Est-ce qu'elle représente bien les valeurs de la communauté et du monde du skate?<span class="required-mark">*</span>
+      <label class="question-label">
+        Trouves-tu que la marque est authentique? Est-ce qu'elle représente bien les valeurs de la communauté et du monde du skate?<span class="required-mark">*</span>
       </label>
+
+      <!-- 1–10 scale -->
+      <div class="scale-wrapper">
+        <div class="scale-buttons" id="scale-q6" role="group" aria-label="Note de 1 à 10">
+          <button type="button" class="scale-btn" data-value="1">1</button>
+          <button type="button" class="scale-btn" data-value="2">2</button>
+          <button type="button" class="scale-btn" data-value="3">3</button>
+          <button type="button" class="scale-btn" data-value="4">4</button>
+          <button type="button" class="scale-btn" data-value="5">5</button>
+          <button type="button" class="scale-btn" data-value="6">6</button>
+          <button type="button" class="scale-btn" data-value="7">7</button>
+          <button type="button" class="scale-btn" data-value="8">8</button>
+          <button type="button" class="scale-btn" data-value="9">9</button>
+          <button type="button" class="scale-btn" data-value="10">10</button>
+        </div>
+        <div class="scale-labels">
+          <span class="scale-label-text">Pas du tout</span>
+          <span class="scale-label-text">Totalement</span>
+        </div>
+      </div>
+      <input type="hidden" id="q6-score" name="q6_score" value="" />
+
+      <!-- Optional comment -->
       <textarea
         id="q6"
         name="q6"
-        placeholder="Écris ta réponse ici..."
-        required
+        placeholder="Écris ta réponse ici... (optionnel)"
+        style="min-height: 80px;"
       ></textarea>
       <span class="field-error">Cette question est obligatoire.</span>
     </div>
@@ -454,6 +546,23 @@
 <script>
   const form = document.getElementById('surveyForm');
 
+  // ── Scale 1–10 for Q6 ──
+  const scaleContainer = document.getElementById('scale-q6');
+  const scaleHidden = document.getElementById('q6-score');
+
+  scaleContainer.addEventListener('click', (e) => {
+    const btn = e.target.closest('.scale-btn');
+    if (!btn) return;
+
+    // Deselect all, select clicked
+    scaleContainer.querySelectorAll('.scale-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    scaleHidden.value = btn.dataset.value;
+
+    // Clear error on selection
+    document.getElementById('block-6').classList.remove('has-error');
+  });
+
   // Question configs
   const questions = [
     { id: 'block-1', type: 'textarea', name: 'q1' },
@@ -461,7 +570,7 @@
     { id: 'block-3', type: 'textarea', name: 'q3' },
     { id: 'block-4', type: 'radio',    name: 'q4' },
     { id: 'block-5', type: 'textarea', name: 'q5' },
-    { id: 'block-6', type: 'textarea', name: 'q6' },
+    { id: 'block-6', type: 'scale',    name: 'q6_score' },
     { id: 'block-7', type: 'textarea', name: 'q7' },
   ];
 
@@ -478,6 +587,8 @@
       } else if (q.type === 'radio') {
         const radios = form.querySelectorAll(`input[name="${q.name}"]`);
         answered = Array.from(radios).some(r => r.checked);
+      } else if (q.type === 'scale') {
+        answered = scaleHidden.value !== '';
       }
 
       if (!answered) {
@@ -498,19 +609,19 @@
       if (ta) ta.addEventListener('input', () => {
         document.getElementById(q.id).classList.remove('has-error');
       });
-    } else {
+    } else if (q.type === 'radio') {
       const radios = form.querySelectorAll(`input[name="${q.name}"]`);
       radios.forEach(r => r.addEventListener('change', () => {
         document.getElementById(q.id).classList.remove('has-error');
       }));
     }
+    // Scale error clearing is handled in the click listener above
   });
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     if (!validateForm()) {
-      // Scroll to first error
       const firstError = document.querySelector('.has-error');
       if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
@@ -525,14 +636,18 @@
     questions.forEach(q => {
       if (q.type === 'textarea') {
         answers[q.name] = form.elements[q.name].value.trim();
-      } else {
+      } else if (q.type === 'radio') {
         const checked = form.querySelector(`input[name="${q.name}"]:checked`);
         answers[q.name] = checked ? checked.value : '';
+      } else if (q.type === 'scale') {
+        answers[q.name] = scaleHidden.value;
       }
     });
 
+    // Also capture the optional Q6 comment
+    answers['q6_comment'] = form.elements['q6'].value.trim();
+
     // ── POST to Power Automate ──
-    // Replace the URL below with your Power Automate HTTP trigger URL
     const POWER_AUTOMATE_URL = 'https://formspree.io/f/xkoepkzy';
 
     try {
@@ -542,7 +657,6 @@
         body: JSON.stringify({ ...answers, timestamp: new Date().toISOString() }),
       });
     } catch (err) {
-      // Optionally handle errors here
       console.error("Erreur lors de l'envoi:", err);
     }
 
