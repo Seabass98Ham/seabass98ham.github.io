@@ -336,7 +336,7 @@
     }
 
     .success-message h2 {
-      font-size: 22px;
+      font-size: 44px;
       font-weight: 600;
       margin-bottom: 10px;
       letter-spacing: -0.02em;
@@ -392,9 +392,24 @@
   <!-- Form -->
   <form id="surveyForm" novalidate>
 
+    <!-- Q8: Text area -->
+    <div class="question-block" id="block-8">
+      <span class="question-number">Question 1</span>
+      <label class="question-label" for="q8">
+        Comment as-tu découvert Palm Isle Skateshop?<span class="required-mark">*</span>
+      </label>
+      <textarea
+        id="q8"
+        name="q8"
+        placeholder="Écris ta réponse ici..."
+        required
+      ></textarea>
+      <span class="field-error">Cette question est obligatoire.</span>
+    </div>
+
     <!-- Q1: Text area -->
     <div class="question-block" id="block-1">
-      <span class="question-number">Question 1</span>
+      <span class="question-number">Question 2</span>
       <label class="question-label" for="q1">
         Qu'est-ce qui selon toi différencie Palm Isle des autres skateshops?<span class="required-mark">*</span>
       </label>
@@ -409,7 +424,7 @@
 
     <!-- Q2: Oui / Non -->
     <div class="question-block" id="block-2">
-      <span class="question-number">Question 2</span>
+      <span class="question-number">Question 3</span>
       <label class="question-label">
         Es-tu un abonné de Palm Isle sur Instagram ou TikTok?<span class="required-mark">*</span>
       </label>
@@ -428,7 +443,7 @@
 
     <!-- Q3: Text area -->
     <div class="question-block" id="block-3">
-      <span class="question-number">Question 3</span>
+      <span class="question-number">Question 4</span>
       <label class="question-label" for="q3">
         Si oui, aimes-tu le contenu partagé par Palm Isle? Est-ce qu'il y a du contenu que tu aimerais voir plus souvent, ou des comptes ou influenceurs que tu aimerais voir supporter la marque?<span class="required-mark">*</span>
       </label>
@@ -443,7 +458,7 @@
 
     <!-- Q4: Oui / Non -->
     <div class="question-block" id="block-4">
-      <span class="question-number">Question 4</span>
+      <span class="question-number">Question 5</span>
       <label class="question-label">
         As-tu déjà participé à un événement ou une activité organisé par Palm Isle?<span class="required-mark">*</span>
       </label>
@@ -462,7 +477,7 @@
 
     <!-- Q5: Text area -->
     <div class="question-block" id="block-5">
-      <span class="question-number">Question 5</span>
+      <span class="question-number">Question 6</span>
       <label class="question-label" for="q5">
         Si oui, quelle a été ton expérience?<span class="required-mark">*</span>
       </label>
@@ -477,7 +492,7 @@
 
     <!-- Q6: Scale + Text area -->
     <div class="question-block" id="block-6">
-      <span class="question-number">Question 6</span>
+      <span class="question-number">Question 7</span>
       <label class="question-label">
         Trouves-tu que la marque est authentique? Est-ce qu'elle représente bien les valeurs de la communauté et du monde du skate?<span class="required-mark">*</span>
       </label>
@@ -515,7 +530,7 @@
 
     <!-- Q7: Text area -->
     <div class="question-block" id="block-7">
-      <span class="question-number">Question 7</span>
+      <span class="question-number">Question 8</span>
       <label class="question-label" for="q7">
         Aurais-tu des suggestions de produits, de services, de contenu ou d'évènements pour améliorer le skateshop ou la marque?<span class="required-mark">*</span>
       </label>
@@ -572,6 +587,7 @@
     { id: 'block-5', type: 'textarea', name: 'q5' },
     { id: 'block-6', type: 'scale',    name: 'q6_score' },
     { id: 'block-7', type: 'textarea', name: 'q7' },
+    { id: 'block-8', type: 'textarea', name: 'q8' },
   ];
 
   function validateForm() {
