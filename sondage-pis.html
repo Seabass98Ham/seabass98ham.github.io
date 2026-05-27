@@ -538,7 +538,7 @@
     try {
       await fetch(POWER_AUTOMATE_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        mode: 'no-cors',
         body: JSON.stringify({ ...answers, timestamp: new Date().toISOString() }),
       });
     } catch (err) {
