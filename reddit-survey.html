@@ -500,75 +500,32 @@
 <script>
   const form = document.getElementById('surveyForm');
 
-  // ── Scale 1–10 for Q6 ──
-  const scaleContainer = document.getElementById('scale-q6');
-  const scaleHidden = document.getElementById('q6-score');
-
-  scaleContainer.addEventListener('click', (e) => {
-    const btn = e.target.closest('.scale-btn');
-    if (!btn) return;
-
-    // Deselect all, select clicked
-    scaleContainer.querySelectorAll('.scale-btn').forEach(b => b.classList.remove('selected'));
-    btn.classList.add('selected');
-    scaleHidden.value = btn.dataset.value;
-
-    // Clear error on selection
-    document.getElementById('block-6').classList.remove('has-error');
-  });
-
-  // Question configs
   const questions = [
     { id: 'block-1', type: 'textarea', name: 'q1' },
-    { id: 'block-2', type: 'textarea',    name: 'q2' },
+    { id: 'block-2', type: 'textarea', name: 'q2' },
     { id: 'block-3', type: 'textarea', name: 'q3' },
-    { id: 'block-4', type: 'textarea',    name: 'q4' },
+    { id: 'block-4', type: 'textarea', name: 'q4' },
     { id: 'block-5', type: 'textarea', name: 'q5' },
     { id: 'block-8', type: 'textarea', name: 'q8' },
   ];
 
   function validateForm() {
     let valid = true;
-
     questions.forEach(q => {
       const block = document.getElementById(q.id);
-      let answered = false;
-
-      if (q.type === 'textarea') {
-        const ta = form.elements[q.name];
-        answered = ta && ta.value.trim().length > 0;
-      } else if (q.type === 'radio') {
-        const radios = form.querySelectorAll(`input[name="${q.name}"]`);
-        answered = Array.from(radios).some(r => r.checked);
-      } else if (q.type === 'scale') {
-        answered = scaleHidden.value !== '';
-      }
-
-      if (!answered) {
-        block.classList.add('has-error');
-        valid = false;
-      } else {
-        block.classList.remove('has-error');
-      }
+      const ta = form.elements[q.name];
+      const answered = ta && ta.value.trim().length > 0;
+      block.classList.toggle('has-error', !answered);
+      if (!answered) valid = false;
     });
-
     return valid;
   }
 
-  // Clear error on interaction
   questions.forEach(q => {
-    if (q.type === 'textarea') {
-      const ta = form.elements[q.name];
-      if (ta) ta.addEventListener('input', () => {
-        document.getElementById(q.id).classList.remove('has-error');
-      });
-    } else if (q.type === 'radio') {
-      const radios = form.querySelectorAll(`input[name="${q.name}"]`);
-      radios.forEach(r => r.addEventListener('change', () => {
-        document.getElementById(q.id).classList.remove('has-error');
-      }));
-    }
-    // Scale error clearing is handled in the click listener above
+    const ta = form.elements[q.name];
+    if (ta) ta.addEventListener('input', () => {
+      document.getElementById(q.id).classList.remove('has-error');
+    });
   });
 
   form.addEventListener('submit', async (e) => {
@@ -582,39 +539,24 @@
 
     const btn = form.querySelector('.btn-submit');
     btn.disabled = true;
-    btn.textContent = "Envoi en cours…";
+    btn.textContent = 'Sending…';
 
-    // ── Collect answers ──
     const answers = {};
     questions.forEach(q => {
-      if (q.type === 'textarea') {
-        answers[q.name] = form.elements[q.name].value.trim();
-      } else if (q.type === 'radio') {
-        const checked = form.querySelector(`input[name="${q.name}"]:checked`);
-        answers[q.name] = checked ? checked.value : '';
-      } else if (q.type === 'scale') {
-        answers[q.name] = scaleHidden.value;
-      }
+      answers[q.name] = form.elements[q.name].value.trim();
     });
 
-    // Also capture the optional Q6 comment
-    answers['q6_comment'] = form.elements['q6'].value.trim();
-
-    // ── POST to Power Automate ──
-    const POWER_AUTOMATE_URL = 'https://formspree.io/f/mnjrlzzg';
-
     try {
-      await fetch(POWER_AUTOMATE_URL, {
+      await fetch('https://formspree.io/f/mnjrlzzg', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({ ...answers, timestamp: new Date().toISOString() }),
       });
     } catch (err) {
-      console.error("Erreur lors de l'envoi:", err);
+      console.error('Submission error:', err);
     }
 
-    // Show success
-    form.style.display = "none";
+    form.style.display = 'none';
     document.getElementById('successMessage').classList.add('visible');
   });
 </script>
