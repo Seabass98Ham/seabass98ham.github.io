@@ -424,7 +424,7 @@
     </div>
     <h1 class="survey-title">Sondage: Palm Isle Skateshop</h1>
     <p class="survey-description">
-      En collaboration avec une équipe étudiante du HEC Montréal, nous conduisons un sondage pour en apprendre plus sur l'expérience client des membres de notre communauté. Le sondage est anonyme et toute info partagée ci-dessous reste strictement confidentielle. Merci!
+      En collaboration avec une équipe étudiante du HEC Montréal, nous conduisons un sondage pour en apprendre plus sur l'expérience client des membres de notre communauté. Le sondage est anonyme et toute info partagée reste strictement confidentielle (voir la politique de confidentialité ci-dessous). Merci!
     </p>
   </div>
 
@@ -432,32 +432,32 @@
 
   <form id="surveyForm" novalidate>
 
-    <!-- Q1 : Âge -->
+    <!-- Q1 : Zone -->
     <div class="question-block" id="block-1">
       <span class="question-number">Question 1</span>
       <label class="question-label">
-        Quel âge as-tu?<span class="required-mark">*</span>
+        Dans quelle région du monde es-tu situé?<span class="required-mark">*</span>
       </label>
-      <div class="radio-group" role="radiogroup" aria-label="Âge">
+      <div class="radio-group" role="radiogroup" aria-label="Zone">
         <div class="radio-option">
-          <input type="radio" id="q1_a" name="q1" value="Moins de 18 ans" />
-          <label for="q1_a">Moins de 18 ans</label>
+          <input type="radio" id="q1_a" name="q1" value="Québec" />
+          <label for="q1_a">Québec</label>
         </div>
         <div class="radio-option">
-          <input type="radio" id="q1_b" name="q1" value="18-29 ans" />
-          <label for="q1_b">18–29 ans</label>
+          <input type="radio" id="q1_b" name="q1" value="ROC" />
+          <label for="q1_b">Reste du Canada (ex., Ontario, Colombie-Britannique, etc.)</label>
         </div>
         <div class="radio-option">
-          <input type="radio" id="q1_c" name="q1" value="30-39 ans" />
-          <label for="q1_c">30–39 ans</label>
+          <input type="radio" id="q1_c" name="q1" value="USA" />
+          <label for="q1_c">États-Unis</label>
         </div>
         <div class="radio-option">
-          <input type="radio" id="q1_d" name="q1" value="40-49 ans" />
-          <label for="q1_d">40–49 ans</label>
+          <input type="radio" id="q1_d" name="q1" value="Europe" />
+          <label for="q1_d">Europe</label>
         </div>
         <div class="radio-option">
-          <input type="radio" id="q1_e" name="q1" value="50 ans et plus" />
-          <label for="q1_e">50 ans et plus</label>
+          <input type="radio" id="q1_e" name="q1" value="Asie" />
+          <label for="q1_e">Asie</label>
         </div>
       </div>
       <span class="field-error">Cette question est obligatoire.</span>
@@ -666,7 +666,7 @@
     <div class="question-block" id="block-11">
       <span class="question-number">Question 11</span>
       <label class="question-label" for="q11">
-        Si oui, comment trouves-tu le contenu partagé par Palm Isle sur cette/ces plateforme(s)?<span class="required-mark">*</span>
+        Si oui, que penses-tu du contenu partagé par Palm Isle sur cette/ces plateforme(s)?<span class="required-mark">*</span>
       </label>
       <textarea id="q11" name="q11" placeholder="Écris ta réponse ici..."></textarea>
       <span class="field-error">Cette question est obligatoire.</span>
@@ -826,7 +826,7 @@
     const q7Checked = Array.from(document.querySelectorAll('input[name="q7"]:checked')).map(cb => cb.value);
 
     const answers = {
-      q1_age:                document.querySelector('input[name="q1"]:checked')?.value,
+      q1_zone:                document.querySelector('input[name="q1"]:checked')?.value,
       q2_niveau:             document.querySelector('input[name="q2"]:checked')?.value,
       q3_decouverte:         q3Val,
       q4_differenciation:    document.getElementById('q4').value.trim(),
@@ -856,6 +856,6 @@
     document.getElementById('successMessage').classList.add('visible');
   });
 </script>
-
+<p style="font-size: 12px; color: dimgray; text-align: center; margin-top: 40px;">Propulsé par Formspree. <span><a style="color: dimgray;" href="https://formspree.io/legal/privacy-policy/">Politique de confidentialité.</a></span></p>
 </body>
 </html>
