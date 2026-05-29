@@ -107,7 +107,7 @@
       margin-bottom: 6px;
     }
 
-    /* Text area */
+    /* ── Text area ── */
     textarea {
       width: 100%;
       min-height: 110px;
@@ -132,14 +132,10 @@
       background: #fafafa;
     }
 
-    textarea:invalid:not(:placeholder-shown) {
-      border-color: #e05555;
-    }
-
-    /* Radio group */
+    /* ── Radio group (single select) ── */
     .radio-group {
       display: flex;
-      gap: 12px;
+      gap: 10px;
       flex-wrap: wrap;
     }
 
@@ -197,6 +193,106 @@
       border-color: #ccc;
     }
 
+    /* ── Checkbox group (multi-select) ── */
+    .checkbox-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .checkbox-option {
+      position: relative;
+    }
+
+    .checkbox-option input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .checkbox-option label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: #f7f7f7;
+      border: 1.5px solid transparent;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #444;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+
+    .checkbox-option label::before {
+      content: '';
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      border: 1.5px solid #ccc;
+      flex-shrink: 0;
+      transition: all 0.15s ease;
+      background: #fff;
+    }
+
+    .checkbox-option input[type="checkbox"]:checked + label {
+      background: #111;
+      border-color: #111;
+      color: #fff;
+    }
+
+    .checkbox-option input[type="checkbox"]:checked + label::before {
+      border-color: #fff;
+      background: #fff;
+      /* Checkmark via box-shadow trick */
+      box-shadow: inset 0 0 0 3px #111;
+      /* Use a background image for the tick */
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M3 8l3.5 3.5 6.5-7' stroke='%23111' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-size: 12px;
+      background-repeat: no-repeat;
+      background-position: center;
+      box-shadow: none;
+    }
+
+    .checkbox-option label:hover {
+      border-color: #ccc;
+    }
+
+    /* "Other" text input that appears inline */
+    .other-input-wrapper {
+      display: none;
+      margin-top: 10px;
+    }
+
+    .other-input-wrapper.visible {
+      display: block;
+    }
+
+    .other-input {
+      width: 100%;
+      padding: 10px 16px;
+      background: #f7f7f7;
+      border: 1.5px solid transparent;
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      color: #111;
+      outline: none;
+      transition: border-color 0.18s ease, background 0.18s ease;
+    }
+
+    .other-input::placeholder {
+      color: #bbb;
+    }
+
+    .other-input:focus {
+      border-color: #111;
+      background: #fafafa;
+    }
+
     /* ── Scale 1–10 ── */
     .scale-wrapper {
       display: flex;
@@ -252,6 +348,20 @@
       font-weight: 500;
     }
 
+    /* Optional follow-up textarea (smaller) */
+    .optional-label {
+      font-size: 12px;
+      color: #aaa;
+      font-weight: 500;
+      display: block;
+      margin-bottom: 8px;
+      margin-top: 16px;
+    }
+
+    textarea.optional {
+      min-height: 80px;
+    }
+
     /* Required asterisk */
     .required-mark {
       color: #e05555;
@@ -270,17 +380,20 @@
       display: block;
     }
 
-    .question-block.has-error textarea {
+    .question-block.has-error textarea:not(.optional) {
       border-color: #e05555;
-    }
-
-    .question-block.has-error .scale-btn:not(.selected) {
-      border-color: transparent;
     }
 
     .question-block.has-error .scale-buttons {
       outline: 1.5px solid #e05555;
       border-radius: 8px;
+    }
+
+    .question-block.has-error .radio-group,
+    .question-block.has-error .checkbox-group {
+      outline: 1.5px solid #e05555;
+      border-radius: 8px;
+      padding: 8px;
     }
 
     /* ── Submit ── */
@@ -330,11 +443,6 @@
       display: block;
     }
 
-    .success-icon {
-      font-size: 40px;
-      margin-bottom: 16px;
-    }
-
     .success-message h2 {
       font-size: 44px;
       font-weight: 600;
@@ -354,12 +462,14 @@
         padding: 32px 16px 64px;
       }
 
-      .radio-group {
+      .radio-group,
+      .checkbox-group {
         flex-direction: column;
         gap: 8px;
       }
 
-      .radio-option label {
+      .radio-option label,
+      .checkbox-option label {
         width: 100%;
         justify-content: flex-start;
       }
@@ -378,12 +488,11 @@
   <!-- Header -->
   <div class="survey-header">
     <div class="logo-placeholder">
-      <!-- Replace the span below with: <img src="your-logo.png" alt="Company logo" /> -->
       <img src="skateboarding-icon.webp" alt="Skateboard Icon"/>
     </div>
     <h1 class="survey-title">Skateboarding Survey</h1>
     <p class="survey-description">
-      We're a team of graduate students running a short survey to learn more about skaters' experience and relationship with brands, influencers and social media content within the broader skateboarding community. The survey is 100% anonymous, and any information shared will remain strictly confidential and only visible to our team. Thanks!  
+      Hey there! 👋 We're a small team of graduate students running a quick survey to learn more about people's experience with skateboarding brands, influencers and social media content. The survey is 100% anonymous, and any shared info will remain confidential and only visible to our team. Thanks!
     </p>
   </div>
 
@@ -392,71 +501,91 @@
   <!-- Form -->
   <form id="surveyForm" novalidate>
 
-    <!-- Q8: Text area -->
-    <div class="question-block" id="block-8">
-      <span class="question-number">Question 1</span>
-      <label class="question-label" for="q8">
-        How long have you been skating?<span class="required-mark">*</span>
-      </label>
-      <textarea
-        id="q8"
-        name="q8"
-        placeholder="Write your answer here..."
-        required
-      ></textarea>
-      <span class="field-error">Please answer this question.</span>
-    </div>
-
-    <!-- Q1: Text area -->
+    <!-- Q1: How long skating — single select radio -->
     <div class="question-block" id="block-1">
-      <span class="question-number">Question 2</span>
-      <label class="question-label" for="q1">
-        Apart from Reddit, what other platforms do you watch skateboarding content on? (ex., Instagram, YouTube, etc.)<span class="required-mark">*</span>
+      <span class="question-number">Question 1</span>
+      <label class="question-label">
+        How long have you been skating for?<span class="required-mark">*</span>
       </label>
-      <textarea
-        id="q1"
-        name="q1"
-        placeholder="Write your answer here..."
-        required
-      ></textarea>
-      <span class="field-error">Please answer this question.</span>
+      <div class="radio-group" role="radiogroup" aria-label="How long have you been skating">
+        <div class="radio-option">
+          <input type="radio" id="q1_a" name="q1" value="Less than a year" />
+          <label for="q1_a">Less than a year</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" id="q1_b" name="q1" value="1–5 years" />
+          <label for="q1_b">1–5 years</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" id="q1_c" name="q1" value="5–10 years" />
+          <label for="q1_c">5–10 years</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" id="q1_d" name="q1" value="10+ years" />
+          <label for="q1_d">10+ years</label>
+        </div>
+      </div>
+      <span class="field-error">Please select an option.</span>
     </div>
 
-    <!-- Q2: Text area -->
+    <!-- Q2: Platforms — multi-select checkbox -->
     <div class="question-block" id="block-2">
-      <span class="question-number">Question 3</span>
-      <label class="question-label" for="q2">
-        Are there any brands, influencers, skaters or accounts that you follow in particular? If so, why?<span class="required-mark">*</span>
+      <span class="question-number">Question 2</span>
+      <label class="question-label">
+        Other than Reddit, which platforms do you use for skateboarding content? <em style="font-weight:400;color:#888;">(Select all that apply)</em><span class="required-mark">*</span>
       </label>
-      <textarea
-        id="q2"
-        name="q2"
-        placeholder="Write your answer here..."
-        required
-      ></textarea>
-      <span class="field-error">Please answer this question.</span>
+      <div class="checkbox-group" role="group" aria-label="Platforms">
+        <div class="checkbox-option">
+          <input type="checkbox" id="q2_instagram" name="q2" value="Instagram" />
+          <label for="q2_instagram">Instagram</label>
+        </div>
+        <div class="checkbox-option">
+          <input type="checkbox" id="q2_tiktok" name="q2" value="TikTok" />
+          <label for="q2_tiktok">TikTok</label>
+        </div>
+        <div class="checkbox-option">
+          <input type="checkbox" id="q2_youtube" name="q2" value="YouTube" />
+          <label for="q2_youtube">YouTube</label>
+        </div>
+        <div class="checkbox-option">
+          <input type="checkbox" id="q2_facebook" name="q2" value="Facebook" />
+          <label for="q2_facebook">Facebook</label>
+        </div>
+        <div class="checkbox-option">
+          <input type="checkbox" id="q2_other" name="q2" value="Other" />
+          <label for="q2_other">Other</label>
+        </div>
+      </div>
+      <div class="other-input-wrapper" id="q2_other_wrapper">
+        <input type="text" class="other-input" id="q2_other_text" placeholder="Please specify…" />
+      </div>
+      <span class="field-error">Please select at least one option.</span>
     </div>
 
-    <!-- Q3: Text area -->
+    <!-- Q3: Follow online skate creators — yes/no -->
     <div class="question-block" id="block-3">
-      <span class="question-number">Question 4</span>
-      <label class="question-label" for="q3">
-        When purchasing skateboarding gear or apparel, what matters most to you? (ex., aesthetics, brand, performance, price, etc.)<span class="required-mark">*</span>
+      <span class="question-number">Question 3</span>
+      <label class="question-label">
+        Do you follow any brands, skaters or influencers in particular?<span class="required-mark">*</span>
       </label>
-      <textarea
-        id="q3"
-        name="q3"
-        placeholder="Write your answer here..."
-        required
-      ></textarea>
-      <span class="field-error">Please answer this question.</span>
+      <div class="radio-group" role="radiogroup" aria-label="Do you follow online skate creators">
+        <div class="radio-option">
+          <input type="radio" id="q3_yes" name="q3" value="Yes" />
+          <label for="q3_yes">Yes</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" id="q3_no" name="q3" value="No" />
+          <label for="q3_no">No</label>
+        </div>
+      </div>
+      <span class="field-error">Please select an option.</span>
     </div>
 
-    <!-- Q4: Text area -->
+    <!-- Q4: Why do you follow -->
     <div class="question-block" id="block-4">
-      <span class="question-number">Question 5</span>
+      <span class="question-number">Question 4</span>
       <label class="question-label" for="q4">
-        Is there a brand that's really nailing it right now in terms of content/products, or one that's lost you? Why?<span class="required-mark">*</span>
+        If so, which ones and why? What do you like about them?<span class="required-mark">*</span>
       </label>
       <textarea
         id="q4"
@@ -467,15 +596,93 @@
       <span class="field-error">Please answer this question.</span>
     </div>
 
-    <!-- Q5: Text area -->
+    <!-- Q5: Purchasing decisions — text area -->
     <div class="question-block" id="block-5">
-      <span class="question-number">Question 6</span>
+      <span class="question-number">Question 5</span>
       <label class="question-label" for="q5">
-        How do you feel about brand collaborations with popular skaters or influencers?<span class="required-mark">*</span>
+        When purchasing skateboarding gear or apparel, what matters most to you? (ex., aesthetics, brand, performance, price, etc.)<span class="required-mark">*</span>
       </label>
       <textarea
         id="q5"
         name="q5"
+        placeholder="Write your answer here..."
+        required
+      ></textarea>
+      <span class="field-error">Please answer this question.</span>
+    </div>
+
+    <!-- Q6: Brand nailing it / lost you — text area -->
+    <div class="question-block" id="block-6">
+      <span class="question-number">Question 6</span>
+      <label class="question-label" for="q6">
+        Is there a brand that's really nailing it right now in terms of content/products, or one that's lost you? Why?<span class="required-mark">*</span>
+      </label>
+      <textarea
+        id="q6"
+        name="q6"
+        placeholder="Write your answer here..."
+        required
+      ></textarea>
+      <span class="field-error">Please answer this question.</span>
+    </div>
+
+    <!-- Q7: Bought because skater recommended — single select radio -->
+    <div class="question-block" id="block-7">
+      <span class="question-number">Question 7</span>
+      <label class="question-label">
+        Have you ever bought a product because a skater or influencer you follow recommended it?<span class="required-mark">*</span>
+      </label>
+      <div class="radio-group" role="radiogroup" aria-label="Have you ever bought a product because a skater recommended it">
+        <div class="radio-option">
+          <input type="radio" id="q7_yes" name="q7" value="Yes" />
+          <label for="q7_yes">Yes</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" id="q7_no" name="q7" value="No" />
+          <label for="q7_no">No</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" id="q7_influenced" name="q7" value="Not directly, but it influenced me" />
+          <label for="q7_influenced">Not directly, but it influenced me</label>
+        </div>
+      </div>
+      <span class="field-error">Please select an option.</span>
+    </div>
+
+    <!-- Q8: Scale 1–10 + optional text -->
+    <div class="question-block" id="block-8">
+      <span class="question-number">Question 8</span>
+      <label class="question-label">
+        On a scale of 1 to 10, how do you feel when a local skate shop partners with a smaller, lesser-known skater to promote their products?<span class="required-mark">*</span>
+      </label>
+      <div class="scale-wrapper">
+        <div class="scale-buttons" id="scaleButtons" role="group" aria-label="Scale 1 to 10">
+          <!-- Buttons injected by JS -->
+        </div>
+        <div class="scale-labels">
+          <span class="scale-label-text">1 — Feels forced</span>
+          <span class="scale-label-text">10 — Feels authentic</span>
+        </div>
+      </div>
+      <span class="optional-label">Optional — anything you'd like to add?</span>
+      <textarea
+        id="q8_text"
+        name="q8_text"
+        class="optional"
+        placeholder="Write your answer here..."
+      ></textarea>
+      <span class="field-error">Please select a value.</span>
+    </div>
+
+    <!-- Q9: Authentic partnerships — text area -->
+    <div class="question-block" id="block-9">
+      <span class="question-number">Question 9</span>
+      <label class="question-label" for="q9">
+        What makes skater-brand partnerships feel authentic to you?<span class="required-mark">*</span>
+      </label>
+      <textarea
+        id="q9"
+        name="q9"
         placeholder="Write your answer here..."
         required
       ></textarea>
@@ -498,41 +705,118 @@
 </div>
 
 <script>
-  const form = document.getElementById('surveyForm');
+  /* ── Scale buttons ── */
+  const scaleContainer = document.getElementById('scaleButtons');
+  let selectedScale = null;
 
-  const questions = [
-    { id: 'block-1', type: 'textarea', name: 'q1' },
-    { id: 'block-2', type: 'textarea', name: 'q2' },
-    { id: 'block-3', type: 'textarea', name: 'q3' },
-    { id: 'block-4', type: 'textarea', name: 'q4' },
-    { id: 'block-5', type: 'textarea', name: 'q5' },
-    { id: 'block-8', type: 'textarea', name: 'q8' },
-  ];
-
-  function validateForm() {
-    let valid = true;
-    questions.forEach(q => {
-      const block = document.getElementById(q.id);
-      const ta = form.elements[q.name];
-      const answered = ta && ta.value.trim().length > 0;
-      block.classList.toggle('has-error', !answered);
-      if (!answered) valid = false;
+  for (let i = 1; i <= 10; i++) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'scale-btn';
+    btn.textContent = i;
+    btn.dataset.value = i;
+    btn.addEventListener('click', () => {
+      selectedScale = i;
+      document.querySelectorAll('.scale-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      document.getElementById('block-8').classList.remove('has-error');
     });
-    return valid;
+    scaleContainer.appendChild(btn);
   }
 
-  questions.forEach(q => {
-    const ta = form.elements[q.name];
-    if (ta) ta.addEventListener('input', () => {
-      document.getElementById(q.id).classList.remove('has-error');
+  /* ── Q2 "Other" checkbox reveals text input ── */
+  const q2OtherCheckbox = document.getElementById('q2_other');
+  const q2OtherWrapper = document.getElementById('q2_other_wrapper');
+
+  q2OtherCheckbox.addEventListener('change', () => {
+    if (q2OtherCheckbox.checked) {
+      q2OtherWrapper.classList.add('visible');
+    } else {
+      q2OtherWrapper.classList.remove('visible');
+      document.getElementById('q2_other_text').value = '';
+    }
+  });
+
+  /* Clear Q3 error on change */
+  document.querySelectorAll('input[name="q3"]').forEach(r =>
+    r.addEventListener('change', () => document.getElementById('block-3').classList.remove('has-error'))
+  );
+
+  /* ── Validation helpers ── */
+  function isRadioAnswered(name) {
+    return !!document.querySelector(`input[name="${name}"]:checked`);
+  }
+
+  function isCheckboxGroupAnswered(name) {
+    return !!document.querySelector(`input[name="${name}"]:checked`);
+  }
+
+  function isTextareaAnswered(id) {
+    const el = document.getElementById(id);
+    return el && el.value.trim().length > 0;
+  }
+
+  /* Clear errors on input */
+  document.querySelectorAll('input[name="q1"]').forEach(r =>
+    r.addEventListener('change', () => document.getElementById('block-1').classList.remove('has-error'))
+  );
+  document.querySelectorAll('input[name="q2"]').forEach(r =>
+    r.addEventListener('change', () => document.getElementById('block-2').classList.remove('has-error'))
+  );
+  document.querySelectorAll('input[name="q7"]').forEach(r =>
+    r.addEventListener('change', () => document.getElementById('block-7').classList.remove('has-error'))
+  );
+
+  ['q4','q5','q6','q9'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', () => {
+      const blockId = 'block-' + id.replace('q','');
+      document.getElementById(blockId).classList.remove('has-error');
     });
   });
+
+  /* ── Form submission ── */
+  const form = document.getElementById('surveyForm');
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    if (!validateForm()) {
-      const firstError = document.querySelector('.has-error');
+    let valid = true;
+    let firstError = null;
+
+    function markError(blockId) {
+      const block = document.getElementById(blockId);
+      block.classList.add('has-error');
+      if (!firstError) firstError = block;
+      valid = false;
+    }
+
+    // Q1 — required radio
+    if (!isRadioAnswered('q1')) markError('block-1');
+
+    // Q2 — required at least one checkbox
+    if (!isCheckboxGroupAnswered('q2')) markError('block-2');
+
+    // Q3 — required radio
+    if (!isRadioAnswered('q3')) markError('block-3');
+
+    // Q4 — always required
+    if (!isTextareaAnswered('q4')) markError('block-4');
+
+    // Q5, Q6, Q9 — required textareas
+    if (!isTextareaAnswered('q5')) markError('block-5');
+    if (!isTextareaAnswered('q6')) markError('block-6');
+
+    // Q7 — required radio
+    if (!isRadioAnswered('q7')) markError('block-7');
+
+    // Q8 — required scale
+    if (selectedScale === null) markError('block-8');
+
+    // Q9 — required textarea
+    if (!isTextareaAnswered('q9')) markError('block-9');
+
+    if (!valid) {
       if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
@@ -541,16 +825,34 @@
     btn.disabled = true;
     btn.textContent = 'Sending…';
 
-    const answers = {};
-    questions.forEach(q => {
-      answers[q.name] = form.elements[q.name].value.trim();
+    /* Collect answers */
+    const q2Checked = Array.from(document.querySelectorAll('input[name="q2"]:checked')).map(cb => {
+      if (cb.value === 'Other') {
+        const txt = document.getElementById('q2_other_text').value.trim();
+        return txt ? `Other: ${txt}` : 'Other';
+      }
+      return cb.value;
     });
+
+    const answers = {
+      q1_skating_duration: document.querySelector('input[name="q1"]:checked')?.value,
+      q2_platforms: q2Checked.join(', '),
+      q3_follows_creators: document.querySelector('input[name="q3"]:checked')?.value,
+      q4_why_follow: document.getElementById('q4').value.trim() || null,
+      q5_purchase_priorities: document.getElementById('q5').value.trim(),
+      q6_brand_impressions: document.getElementById('q6').value.trim(),
+      q7_bought_from_recommendation: document.querySelector('input[name="q7"]:checked')?.value,
+      q8_authenticity_scale: selectedScale,
+      q8_authenticity_comment: document.getElementById('q8_text').value.trim() || null,
+      q9_authentic_partnerships: document.getElementById('q9').value.trim(),
+      timestamp: new Date().toISOString(),
+    };
 
     try {
       await fetch('https://formspree.io/f/mnjrlzzg', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({ ...answers, timestamp: new Date().toISOString() }),
+        body: JSON.stringify(answers),
       });
     } catch (err) {
       console.error('Submission error:', err);
