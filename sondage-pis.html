@@ -51,14 +51,6 @@
       object-fit: contain;
     }
 
-    .logo-placeholder .logo-label {
-      font-size: 11px;
-      font-weight: 500;
-      color: #aaa;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-    }
-
     .survey-title {
       font-size: clamp(24px, 5vw, 32px);
       font-weight: 600;
@@ -107,7 +99,7 @@
       margin-bottom: 6px;
     }
 
-    /* Text area */
+    /* ── Text area ── */
     textarea {
       width: 100%;
       min-height: 110px;
@@ -123,29 +115,21 @@
       outline: none;
     }
 
-    textarea::placeholder {
-      color: #bbb;
-    }
+    textarea::placeholder { color: #bbb; }
 
     textarea:focus {
       border-color: #111;
       background: #fafafa;
     }
 
-    textarea:invalid:not(:placeholder-shown) {
-      border-color: #e05555;
-    }
-
-    /* Radio group */
+    /* ── Radio group ── */
     .radio-group {
       display: flex;
-      gap: 12px;
+      gap: 10px;
       flex-wrap: wrap;
     }
 
-    .radio-option {
-      position: relative;
-    }
+    .radio-option { position: relative; }
 
     .radio-option input[type="radio"] {
       position: absolute;
@@ -193,9 +177,87 @@
       box-shadow: inset 0 0 0 4px #111;
     }
 
-    .radio-option label:hover {
-      border-color: #ccc;
+    .radio-option label:hover { border-color: #ccc; }
+
+    /* ── Checkbox group (multi-select) ── */
+    .checkbox-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
     }
+
+    .checkbox-option { position: relative; }
+
+    .checkbox-option input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .checkbox-option label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: #f7f7f7;
+      border: 1.5px solid transparent;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #444;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+
+    .checkbox-option label::before {
+      content: '';
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      border: 1.5px solid #ccc;
+      flex-shrink: 0;
+      transition: all 0.15s ease;
+      background: #fff;
+    }
+
+    .checkbox-option input[type="checkbox"]:checked + label {
+      background: #111;
+      border-color: #111;
+      color: #fff;
+    }
+
+    .checkbox-option input[type="checkbox"]:checked + label::before {
+      border-color: #fff;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M3 8l3.5 3.5 6.5-7' stroke='%23111' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-size: 12px;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-color: #fff;
+    }
+
+    .checkbox-option label:hover { border-color: #ccc; }
+
+    /* "Autre" text input reveal */
+    .other-input-wrapper { display: none; margin-top: 10px; }
+    .other-input-wrapper.visible { display: block; }
+
+    .other-input {
+      width: 100%;
+      padding: 10px 16px;
+      background: #f7f7f7;
+      border: 1.5px solid transparent;
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      color: #111;
+      outline: none;
+      transition: border-color 0.18s ease, background 0.18s ease;
+    }
+
+    .other-input::placeholder { color: #bbb; }
+    .other-input:focus { border-color: #111; background: #fafafa; }
 
     /* ── Scale 1–10 ── */
     .scale-wrapper {
@@ -230,9 +292,7 @@
       padding: 0;
     }
 
-    .scale-btn:hover {
-      border-color: #ccc;
-    }
+    .scale-btn:hover { border-color: #ccc; }
 
     .scale-btn.selected {
       background: #111;
@@ -252,13 +312,22 @@
       font-weight: 500;
     }
 
-    /* Required asterisk */
-    .required-mark {
-      color: #e05555;
-      margin-left: 2px;
+    /* Optional textarea */
+    .optional-label {
+      font-size: 12px;
+      color: #aaa;
+      font-weight: 500;
+      display: block;
+      margin-bottom: 8px;
+      margin-top: 16px;
     }
 
-    /* Validation message */
+    textarea.optional { min-height: 80px; }
+
+    /* Required asterisk */
+    .required-mark { color: #e05555; margin-left: 2px; }
+
+    /* Validation */
     .field-error {
       font-size: 12px;
       color: #e05555;
@@ -266,21 +335,19 @@
       display: none;
     }
 
-    .question-block.has-error .field-error {
-      display: block;
-    }
-
-    .question-block.has-error textarea {
-      border-color: #e05555;
-    }
-
-    .question-block.has-error .scale-btn:not(.selected) {
-      border-color: transparent;
-    }
+    .question-block.has-error .field-error { display: block; }
+    .question-block.has-error textarea:not(.optional) { border-color: #e05555; }
 
     .question-block.has-error .scale-buttons {
       outline: 1.5px solid #e05555;
       border-radius: 8px;
+    }
+
+    .question-block.has-error .radio-group,
+    .question-block.has-error .checkbox-group {
+      outline: 1.5px solid #e05555;
+      border-radius: 8px;
+      padding: 8px;
     }
 
     /* ── Submit ── */
@@ -306,34 +373,18 @@
       max-width: 320px;
     }
 
-    .btn-submit:hover {
-      background: #333;
-    }
+    .btn-submit:hover { background: #333; }
+    .btn-submit:active { transform: scale(0.98); }
+    .btn-submit:disabled { background: #999; cursor: not-allowed; }
 
-    .btn-submit:active {
-      transform: scale(0.98);
-    }
-
-    .btn-submit:disabled {
-      background: #999;
-      cursor: not-allowed;
-    }
-
-    /* ── Success message ── */
+    /* ── Success ── */
     .success-message {
       display: none;
       text-align: center;
       padding: 48px 24px;
     }
 
-    .success-message.visible {
-      display: block;
-    }
-
-    .success-icon {
-      font-size: 40px;
-      margin-bottom: 16px;
-    }
+    .success-message.visible { display: block; }
 
     .success-message h2 {
       font-size: 44px;
@@ -350,24 +401,15 @@
 
     /* ── Responsive ── */
     @media (max-width: 480px) {
-      body {
-        padding: 32px 16px 64px;
-      }
+      body { padding: 32px 16px 64px; }
 
-      .radio-group {
-        flex-direction: column;
-        gap: 8px;
-      }
+      .radio-group,
+      .checkbox-group { flex-direction: column; gap: 8px; }
 
-      .radio-option label {
-        width: 100%;
-        justify-content: flex-start;
-      }
+      .radio-option label,
+      .checkbox-option label { width: 100%; justify-content: flex-start; }
 
-      .scale-btn {
-        font-size: 12px;
-        border-radius: 6px;
-      }
+      .scale-btn { font-size: 12px; border-radius: 6px; }
     }
   </style>
 </head>
@@ -378,8 +420,7 @@
   <!-- Header -->
   <div class="survey-header">
     <div class="logo-placeholder">
-      <!-- Replace the span below with: <img src="your-logo.png" alt="Company logo" /> -->
-      <img src="pis-logo.png" alt="Logo"/>
+      <img src="pis-logo.png" alt="Logo Palm Isle Skateshop" />
     </div>
     <h1 class="survey-title">Sondage: Palm Isle Skateshop</h1>
     <p class="survey-description">
@@ -389,157 +430,261 @@
 
   <hr class="divider" />
 
-  <!-- Form -->
   <form id="surveyForm" novalidate>
 
-    <!-- Q8: Text area -->
-    <div class="question-block" id="block-8">
-      <span class="question-number">Question 1</span>
-      <label class="question-label" for="q8">
-        Comment as-tu découvert Palm Isle Skateshop?<span class="required-mark">*</span>
-      </label>
-      <textarea
-        id="q8"
-        name="q8"
-        placeholder="Écris ta réponse ici..."
-        required
-      ></textarea>
-      <span class="field-error">Cette question est obligatoire.</span>
-    </div>
-
-    <!-- Q1: Text area -->
+    <!-- Q1 : Âge -->
     <div class="question-block" id="block-1">
-      <span class="question-number">Question 2</span>
-      <label class="question-label" for="q1">
-        Qu'est-ce qui selon toi différencie Palm Isle des autres skateshops?<span class="required-mark">*</span>
+      <span class="question-number">Question 1</span>
+      <label class="question-label">
+        Quel âge as-tu?<span class="required-mark">*</span>
       </label>
-      <textarea
-        id="q1"
-        name="q1"
-        placeholder="Écris ta réponse ici..."
-        required
-      ></textarea>
+      <div class="radio-group" role="radiogroup" aria-label="Âge">
+        <div class="radio-option">
+          <input type="radio" id="q1_a" name="q1" value="Moins de 18 ans" />
+          <label for="q1_a">Moins de 18 ans</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" id="q1_b" name="q1" value="18-29 ans" />
+          <label for="q1_b">18–29 ans</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" id="q1_c" name="q1" value="30-39 ans" />
+          <label for="q1_c">30–39 ans</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" id="q1_d" name="q1" value="40-49 ans" />
+          <label for="q1_d">40–49 ans</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" id="q1_e" name="q1" value="50 ans et plus" />
+          <label for="q1_e">50 ans et plus</label>
+        </div>
+      </div>
       <span class="field-error">Cette question est obligatoire.</span>
     </div>
 
-    <!-- Q2: Oui / Non -->
+    <!-- Q2 : Niveau de skateboard -->
     <div class="question-block" id="block-2">
+      <span class="question-number">Question 2</span>
+      <label class="question-label">
+        Comment décrirais-tu ton niveau d'aisance au skateboard?<span class="required-mark">*</span>
+      </label>
+      <div class="radio-group" role="radiogroup" aria-label="Niveau de skateboard">
+        <div class="radio-option">
+          <input type="radio" id="q2_a" name="q2" value="Débutant" />
+          <label for="q2_a">Débutant</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" id="q2_b" name="q2" value="Intermédiaire" />
+          <label for="q2_b">Intermédiaire</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" id="q2_c" name="q2" value="Avancé" />
+          <label for="q2_c">Avancé</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" id="q2_d" name="q2" value="Je ne fais pas de skateboard" />
+          <label for="q2_d">Je ne fais pas de skateboard</label>
+        </div>
+      </div>
+      <span class="field-error">Cette question est obligatoire.</span>
+    </div>
+
+    <!-- Q3 : Découverte de Palm Isle -->
+    <div class="question-block" id="block-3">
       <span class="question-number">Question 3</span>
       <label class="question-label">
-        Es-tu un abonné de Palm Isle sur Instagram ou TikTok?<span class="required-mark">*</span>
+        Comment as-tu découvert Palm Isle Skateshop?<span class="required-mark">*</span>
       </label>
-      <div class="radio-group" role="radiogroup">
+      <div class="radio-group" role="radiogroup" aria-label="Découverte de Palm Isle">
         <div class="radio-option">
-          <input type="radio" name="q2" id="q2-Oui" value="Oui" required />
-          <label for="q2-Oui">Oui</label>
+          <input type="radio" id="q3_a" name="q3" value="Sur Instagram" />
+          <label for="q3_a">Sur Instagram</label>
         </div>
         <div class="radio-option">
-          <input type="radio" name="q2" id="q2-Non" value="Non" />
-          <label for="q2-Non">Non</label>
+          <input type="radio" id="q3_b" name="q3" value="Via le bouche-à-oreille" />
+          <label for="q3_b">Via le bouche-à-oreille</label>
         </div>
+        <div class="radio-option">
+          <input type="radio" id="q3_c" name="q3" value="Dans la rue, en me baladant" />
+          <label for="q3_c">Dans la rue, en me baladant</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" id="q3_d" name="q3" value="Autre" />
+          <label for="q3_d">Autre</label>
+        </div>
+      </div>
+      <div class="other-input-wrapper" id="q3_other_wrapper">
+        <input type="text" class="other-input" id="q3_other_text" placeholder="Précisez..." />
       </div>
       <span class="field-error">Cette question est obligatoire.</span>
     </div>
 
-    <!-- Q3: Text area -->
-    <div class="question-block" id="block-3">
+    <!-- Q4 : Différenciation Palm Isle (texte) -->
+    <div class="question-block" id="block-4">
       <span class="question-number">Question 4</span>
-      <label class="question-label" for="q3">
-        Si oui, aimes-tu le contenu partagé par Palm Isle? Est-ce qu'il y a du contenu que tu aimerais voir plus souvent, ou des comptes ou influenceurs que tu aimerais voir supporter la marque?<span class="required-mark">*</span>
+      <label class="question-label" for="q4">
+        Qu'est-ce qui, selon toi, différencie Palm Isle des autres magasins de skateboard?<span class="required-mark">*</span>
       </label>
-      <textarea
-        id="q3"
-        name="q3"
-        placeholder="Écris ta réponse ici..."
-        required
-      ></textarea>
+      <textarea id="q4" name="q4" placeholder="Écris ta réponse ici..."></textarea>
       <span class="field-error">Cette question est obligatoire.</span>
     </div>
 
-    <!-- Q4: Oui / Non -->
-    <div class="question-block" id="block-4">
+    <!-- Q5 : Échelle authenticité -->
+    <div class="question-block" id="block-5">
       <span class="question-number">Question 5</span>
       <label class="question-label">
-        As-tu déjà participé à un événement ou une activité organisé par Palm Isle?<span class="required-mark">*</span>
+        De 1 à 10, à quel point trouves-tu que Palm Isle représente authentiquement les valeurs de la communauté et de la culture du skateboard?<span class="required-mark">*</span>
       </label>
-      <div class="radio-group" role="radiogroup">
+      <div class="scale-wrapper">
+        <div class="scale-buttons" id="scale-q5" role="group" aria-label="Note de 1 à 10"></div>
+        <div class="scale-labels">
+          <span class="scale-label-text">1 — Pas du tout</span>
+          <span class="scale-label-text">10 — Totalement</span>
+        </div>
+      </div>
+      <input type="hidden" id="q5_score" name="q5_score" value="" />
+      <span class="field-error">Cette question est obligatoire.</span>
+    </div>
+
+    <!-- Q6 : Fréquence d'achat -->
+    <div class="question-block" id="block-6">
+      <span class="question-number">Question 6</span>
+      <label class="question-label">
+        À quelle fréquence achètes-tu chez Palm Isle?<span class="required-mark">*</span>
+      </label>
+      <div class="radio-group" role="radiogroup" aria-label="Fréquence d'achat">
         <div class="radio-option">
-          <input type="radio" name="q4" id="q4-Oui" value="Oui" required />
-          <label for="q4-Oui">Oui</label>
+          <input type="radio" id="q6_a" name="q6" value="Une seule fois" />
+          <label for="q6_a">Une seule fois</label>
         </div>
         <div class="radio-option">
-          <input type="radio" name="q4" id="q4-Non" value="Non" />
-          <label for="q4-Non">Non</label>
+          <input type="radio" id="q6_b" name="q6" value="À l'occasion" />
+          <label for="q6_b">À l'occasion</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" id="q6_c" name="q6" value="Régulièrement" />
+          <label for="q6_c">Régulièrement</label>
         </div>
       </div>
       <span class="field-error">Cette question est obligatoire.</span>
     </div>
 
-    <!-- Q5: Text area -->
-    <div class="question-block" id="block-5">
-      <span class="question-number">Question 6</span>
-      <label class="question-label" for="q5">
-        Si oui, quelle a été ton expérience?<span class="required-mark">*</span>
-      </label>
-      <textarea
-        id="q5"
-        name="q5"
-        placeholder="Écris ta réponse ici..."
-        required
-      ></textarea>
-      <span class="field-error">Cette question est obligatoire.</span>
-    </div>
-
-    <!-- Q6: Scale + Text area -->
-    <div class="question-block" id="block-6">
+    <!-- Q7 : Catégories d'achat (multi-select) -->
+    <div class="question-block" id="block-7">
       <span class="question-number">Question 7</span>
       <label class="question-label">
-        Trouves-tu que la marque est authentique? Est-ce qu'elle représente bien les valeurs de la communauté et du monde du skate?<span class="required-mark">*</span>
+        Qu'achètes-tu le plus souvent? <em style="font-weight:400;color:#888;">(Sélectionne tout ce qui s'applique)</em><span class="required-mark">*</span>
       </label>
-
-      <!-- 1–10 scale -->
-      <div class="scale-wrapper">
-        <div class="scale-buttons" id="scale-q6" role="group" aria-label="Note de 1 à 10">
-          <button type="button" class="scale-btn" data-value="1">1</button>
-          <button type="button" class="scale-btn" data-value="2">2</button>
-          <button type="button" class="scale-btn" data-value="3">3</button>
-          <button type="button" class="scale-btn" data-value="4">4</button>
-          <button type="button" class="scale-btn" data-value="5">5</button>
-          <button type="button" class="scale-btn" data-value="6">6</button>
-          <button type="button" class="scale-btn" data-value="7">7</button>
-          <button type="button" class="scale-btn" data-value="8">8</button>
-          <button type="button" class="scale-btn" data-value="9">9</button>
-          <button type="button" class="scale-btn" data-value="10">10</button>
+      <div class="checkbox-group" role="group" aria-label="Catégories d'achat">
+        <div class="checkbox-option">
+          <input type="checkbox" id="q7_a" name="q7" value="Des vêtements" />
+          <label for="q7_a">Des vêtements</label>
         </div>
-        <div class="scale-labels">
-          <span class="scale-label-text">Pas du tout</span>
-          <span class="scale-label-text">100%</span>
+        <div class="checkbox-option">
+          <input type="checkbox" id="q7_b" name="q7" value="De l'équipement (protections, etc.)" />
+          <label for="q7_b">De l'équipement (protections, etc.)</label>
+        </div>
+        <div class="checkbox-option">
+          <input type="checkbox" id="q7_c" name="q7" value="Des planches" />
+          <label for="q7_c">Des planches</label>
+        </div>
+        <div class="checkbox-option">
+          <input type="checkbox" id="q7_d" name="q7" value="Des pièces pour mon skateboard" />
+          <label for="q7_d">Des pièces pour mon skateboard</label>
+        </div>
+        <div class="checkbox-option">
+          <input type="checkbox" id="q7_e" name="q7" value="De la déco ou des accessoires" />
+          <label for="q7_e">De la déco ou des accessoires</label>
         </div>
       </div>
-      <input type="hidden" id="q6-score" name="q6_score" value="" />
+      <span class="field-error">Sélectionne au moins une option.</span>
+    </div>
 
-      <!-- Optional comment -->
-      <textarea
-        id="q6"
-        name="q6"
-        placeholder="Écris ta réponse ici... (optionnel)"
-        style="min-height: 80px;"
-      ></textarea>
+    <!-- Q8 : Boutique en ligne -->
+    <div class="question-block" id="block-8">
+      <span class="question-number">Question 8</span>
+      <label class="question-label">
+        As-tu déjà acheté un item dans la boutique en ligne de Palm Isle?<span class="required-mark">*</span>
+      </label>
+      <div class="radio-group" role="radiogroup" aria-label="Boutique en ligne">
+        <div class="radio-option">
+          <input type="radio" id="q8_oui" name="q8" value="Oui" />
+          <label for="q8_oui">Oui</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" id="q8_non" name="q8" value="Non" />
+          <label for="q8_non">Non</label>
+        </div>
+      </div>
       <span class="field-error">Cette question est obligatoire.</span>
     </div>
 
-    <!-- Q7: Text area -->
-    <div class="question-block" id="block-7">
-      <span class="question-number">Question 8</span>
-      <label class="question-label" for="q7">
-        Aurais-tu des suggestions de produits, de services, de contenu ou d'évènements pour améliorer le skateshop ou la marque?<span class="required-mark">*</span>
+    <!-- Q9 : Abonné Instagram -->
+    <div class="question-block" id="block-9">
+      <span class="question-number">Question 9</span>
+      <label class="question-label">
+        Es-tu abonné à Palm Isle sur Instagram?<span class="required-mark">*</span>
       </label>
-      <textarea
-        id="q7"
-        name="q7"
-        placeholder="Écris ta réponse ici..."
-        required
-      ></textarea>
+      <div class="radio-group" role="radiogroup" aria-label="Abonné Instagram">
+        <div class="radio-option">
+          <input type="radio" id="q9_oui" name="q9" value="Oui" />
+          <label for="q9_oui">Oui</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" id="q9_non" name="q9" value="Non" />
+          <label for="q9_non">Non</label>
+        </div>
+      </div>
+      <span class="field-error">Cette question est obligatoire.</span>
+    </div>
+
+    <!-- Q10 : Abonné TikTok -->
+    <div class="question-block" id="block-10">
+      <span class="question-number">Question 10</span>
+      <label class="question-label">
+        Es-tu abonné à Palm Isle sur TikTok?<span class="required-mark">*</span>
+      </label>
+      <div class="radio-group" role="radiogroup" aria-label="Abonné TikTok">
+        <div class="radio-option">
+          <input type="radio" id="q10_oui" name="q10" value="Oui" />
+          <label for="q10_oui">Oui</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" id="q10_non" name="q10" value="Non" />
+          <label for="q10_non">Non</label>
+        </div>
+      </div>
+      <span class="field-error">Cette question est obligatoire.</span>
+    </div>
+
+    <!-- Q11 : Avis sur le contenu (texte) -->
+    <div class="question-block" id="block-11">
+      <span class="question-number">Question 11</span>
+      <label class="question-label" for="q11">
+        Si oui, comment trouves-tu le contenu partagé par Palm Isle sur cette/ces plateforme(s)?<span class="required-mark">*</span>
+      </label>
+      <textarea id="q11" name="q11" placeholder="Écris ta réponse ici..."></textarea>
+      <span class="field-error">Cette question est obligatoire.</span>
+    </div>
+
+    <!-- Q12 : Contenu souhaité (texte) -->
+    <div class="question-block" id="block-12">
+      <span class="question-number">Question 12</span>
+      <label class="question-label" for="q12">
+        Quel genre de contenu aimerais-tu voir plus souvent?<span class="required-mark">*</span>
+      </label>
+      <textarea id="q12" name="q12" placeholder="Écris ta réponse ici..."></textarea>
+      <span class="field-error">Cette question est obligatoire.</span>
+    </div>
+
+    <!-- Q13 : Suggestions (texte) -->
+    <div class="question-block" id="block-13">
+      <span class="question-number">Question 13</span>
+      <label class="question-label" for="q13">
+        Aurais-tu des suggestions de produits, de services, de contenu ou d'événements pour améliorer le skateshop ou la marque?<span class="required-mark">*</span>
+      </label>
+      <textarea id="q13" name="q13" placeholder="Écris ta réponse ici..."></textarea>
       <span class="field-error">Cette question est obligatoire.</span>
     </div>
 
@@ -559,125 +704,151 @@
 </div>
 
 <script>
-  const form = document.getElementById('surveyForm');
+  /* ── Scale Q5 ── */
+  const scaleContainer = document.getElementById('scale-q5');
+  const scaleHidden    = document.getElementById('q5_score');
 
-  // ── Scale 1–10 for Q6 ──
-  const scaleContainer = document.getElementById('scale-q6');
-  const scaleHidden = document.getElementById('q6-score');
-
-  scaleContainer.addEventListener('click', (e) => {
-    const btn = e.target.closest('.scale-btn');
-    if (!btn) return;
-
-    // Deselect all, select clicked
-    scaleContainer.querySelectorAll('.scale-btn').forEach(b => b.classList.remove('selected'));
-    btn.classList.add('selected');
-    scaleHidden.value = btn.dataset.value;
-
-    // Clear error on selection
-    document.getElementById('block-6').classList.remove('has-error');
-  });
-
-  // Question configs
-  const questions = [
-    { id: 'block-1', type: 'textarea', name: 'q1' },
-    { id: 'block-2', type: 'radio',    name: 'q2' },
-    { id: 'block-3', type: 'textarea', name: 'q3' },
-    { id: 'block-4', type: 'radio',    name: 'q4' },
-    { id: 'block-5', type: 'textarea', name: 'q5' },
-    { id: 'block-6', type: 'scale',    name: 'q6_score' },
-    { id: 'block-7', type: 'textarea', name: 'q7' },
-    { id: 'block-8', type: 'textarea', name: 'q8' },
-  ];
-
-  function validateForm() {
-    let valid = true;
-
-    questions.forEach(q => {
-      const block = document.getElementById(q.id);
-      let answered = false;
-
-      if (q.type === 'textarea') {
-        const ta = form.elements[q.name];
-        answered = ta && ta.value.trim().length > 0;
-      } else if (q.type === 'radio') {
-        const radios = form.querySelectorAll(`input[name="${q.name}"]`);
-        answered = Array.from(radios).some(r => r.checked);
-      } else if (q.type === 'scale') {
-        answered = scaleHidden.value !== '';
-      }
-
-      if (!answered) {
-        block.classList.add('has-error');
-        valid = false;
-      } else {
-        block.classList.remove('has-error');
-      }
+  for (let i = 1; i <= 10; i++) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'scale-btn';
+    btn.textContent = i;
+    btn.dataset.value = i;
+    btn.addEventListener('click', () => {
+      scaleContainer.querySelectorAll('.scale-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      scaleHidden.value = i;
+      document.getElementById('block-5').classList.remove('has-error');
     });
-
-    return valid;
+    scaleContainer.appendChild(btn);
   }
 
-  // Clear error on interaction
-  questions.forEach(q => {
-    if (q.type === 'textarea') {
-      const ta = form.elements[q.name];
-      if (ta) ta.addEventListener('input', () => {
-        document.getElementById(q.id).classList.remove('has-error');
-      });
-    } else if (q.type === 'radio') {
-      const radios = form.querySelectorAll(`input[name="${q.name}"]`);
-      radios.forEach(r => r.addEventListener('change', () => {
-        document.getElementById(q.id).classList.remove('has-error');
-      }));
-    }
-    // Scale error clearing is handled in the click listener above
+  /* ── Q3 "Autre" reveals text input ── */
+  document.querySelectorAll('input[name="q3"]').forEach(r => {
+    r.addEventListener('change', () => {
+      const wrapper = document.getElementById('q3_other_wrapper');
+      if (r.value === 'Autre' && r.checked) {
+        wrapper.classList.add('visible');
+      } else {
+        wrapper.classList.remove('visible');
+        document.getElementById('q3_other_text').value = '';
+      }
+    });
   });
+
+  /* ── Validation helpers ── */
+  function isRadioAnswered(name) {
+    return !!document.querySelector(`input[name="${name}"]:checked`);
+  }
+
+  function isCheckboxAnswered(name) {
+    return !!document.querySelector(`input[name="${name}"]:checked`);
+  }
+
+  function isTextareaAnswered(id) {
+    const el = document.getElementById(id);
+    return el && el.value.trim().length > 0;
+  }
+
+  /* ── Clear errors on interaction ── */
+  ['q1','q2','q3','q6','q8','q9','q10'].forEach(name => {
+    document.querySelectorAll(`input[name="${name}"]`).forEach(r =>
+      r.addEventListener('change', () => {
+        const idx = name.replace('q','');
+        document.getElementById('block-' + idx).classList.remove('has-error');
+      })
+    );
+  });
+
+  document.querySelectorAll('input[name="q7"]').forEach(cb =>
+    cb.addEventListener('change', () => document.getElementById('block-7').classList.remove('has-error'))
+  );
+
+  ['q4','q11','q12','q13'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', () => {
+      const idx = id.replace('q','');
+      document.getElementById('block-' + idx).classList.remove('has-error');
+    });
+  });
+
+  /* ── Form submission ── */
+  const form = document.getElementById('surveyForm');
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    if (!validateForm()) {
-      const firstError = document.querySelector('.has-error');
+    let valid = true;
+    let firstError = null;
+
+    function markError(blockId) {
+      const block = document.getElementById(blockId);
+      block.classList.add('has-error');
+      if (!firstError) firstError = block;
+      valid = false;
+    }
+
+    if (!isRadioAnswered('q1'))     markError('block-1');
+    if (!isRadioAnswered('q2'))     markError('block-2');
+    if (!isRadioAnswered('q3'))     markError('block-3');
+    if (!isTextareaAnswered('q4'))  markError('block-4');
+    if (!scaleHidden.value)         markError('block-5');
+    if (!isRadioAnswered('q6'))     markError('block-6');
+    if (!isCheckboxAnswered('q7'))  markError('block-7');
+    if (!isRadioAnswered('q8'))     markError('block-8');
+    if (!isRadioAnswered('q9'))     markError('block-9');
+    if (!isRadioAnswered('q10'))    markError('block-10');
+    if (!isTextareaAnswered('q11')) markError('block-11');
+    if (!isTextareaAnswered('q12')) markError('block-12');
+    if (!isTextareaAnswered('q13')) markError('block-13');
+
+    if (!valid) {
       if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
 
     const btn = form.querySelector('.btn-submit');
     btn.disabled = true;
-    btn.textContent = "Envoi en cours…";
+    btn.textContent = 'Envoi en cours…';
 
-    // ── Collect answers ──
-    const answers = {};
-    questions.forEach(q => {
-      if (q.type === 'textarea') {
-        answers[q.name] = form.elements[q.name].value.trim();
-      } else if (q.type === 'radio') {
-        const checked = form.querySelector(`input[name="${q.name}"]:checked`);
-        answers[q.name] = checked ? checked.value : '';
-      } else if (q.type === 'scale') {
-        answers[q.name] = scaleHidden.value;
-      }
-    });
+    /* Collect answers */
+    const q3Checked = document.querySelector('input[name="q3"]:checked');
+    let q3Val = q3Checked ? q3Checked.value : '';
+    if (q3Val === 'Autre') {
+      const txt = document.getElementById('q3_other_text').value.trim();
+      if (txt) q3Val = 'Autre: ' + txt;
+    }
 
-    // Also capture the optional Q6 comment
-    answers['q6_comment'] = form.elements['q6'].value.trim();
+    const q7Checked = Array.from(document.querySelectorAll('input[name="q7"]:checked')).map(cb => cb.value);
 
-    // ── POST to Power Automate ──
-    const POWER_AUTOMATE_URL = 'https://formspree.io/f/xkoepkzy';
+    const answers = {
+      q1_age:                document.querySelector('input[name="q1"]:checked')?.value,
+      q2_niveau:             document.querySelector('input[name="q2"]:checked')?.value,
+      q3_decouverte:         q3Val,
+      q4_differenciation:    document.getElementById('q4').value.trim(),
+      q5_authenticite_score: scaleHidden.value,
+      q6_frequence:          document.querySelector('input[name="q6"]:checked')?.value,
+      q7_categories:         q7Checked.join(', '),
+      q8_boutique_enligne:   document.querySelector('input[name="q8"]:checked')?.value,
+      q9_instagram:          document.querySelector('input[name="q9"]:checked')?.value,
+      q10_tiktok:            document.querySelector('input[name="q10"]:checked')?.value,
+      q11_avis_contenu:      document.getElementById('q11').value.trim(),
+      q12_contenu_souhaite:  document.getElementById('q12').value.trim(),
+      q13_suggestions:       document.getElementById('q13').value.trim(),
+      timestamp:             new Date().toISOString(),
+    };
 
     try {
-      await fetch(POWER_AUTOMATE_URL, {
+      await fetch('https://formspree.io/f/xkoepkzy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({ ...answers, timestamp: new Date().toISOString() }),
+        body: JSON.stringify(answers),
       });
     } catch (err) {
       console.error("Erreur lors de l'envoi:", err);
     }
 
-    // Show success
-    form.style.display = "none";
+    form.style.display = 'none';
     document.getElementById('successMessage').classList.add('visible');
   });
 </script>
