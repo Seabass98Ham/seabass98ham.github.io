@@ -22,7 +22,7 @@ img {
 	height: 75px;
 	width: 75px;
 	object-fit: cover;
-	margin-bottom: 16px;
+	margin-bottom: 20px;
 }
 
 h1 {
@@ -30,7 +30,7 @@ h1 {
 	font-weight: 300;
 	letter-spacing: 10px;
 	font-size: 20px;
-	margin-bottom: 6px;
+	margin-bottom: 20px;
 }
 
 h2 {
@@ -47,7 +47,7 @@ h2 {
 	font-weight: 300;
 	line-height: 30px;
 	font-size: 18px;
-	margin-bottom: 4px;
+	margin-bottom: 20px;
 }
 
 .button {
