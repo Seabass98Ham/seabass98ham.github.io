@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aldo Montréal distribution center: package flow</title>
+<style>
+:root{
+  --bg:#ffffff;
+  --text-primary:#1d2125;
+  --text-secondary:#5a6068;
+  --surface-1:#f1f3f5;
+  --border-strong:#b7bcc3;
+  --border-stronger:#8a9099;
+  --accent:#185FA5;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#16191d;
+    --text-primary:#eceef0;
+    --text-secondary:#a4aab2;
+    --surface-1:#22272d;
+    --border-strong:#4a525c;
+    --border-stronger:#6b7480;
+    --accent:#85B7EB;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text-primary)}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.6;padding:24px 16px 48px}
+main{max-width:760px;margin:0 auto}
+h1{font-size:22px;font-weight:500;margin:0 0 4px}
+p.sub{margin:0 0 20px;color:var(--text-secondary);font-size:15px}
+svg{display:block;width:100%;height:auto}
+.box{fill:var(--surface-1);stroke:var(--border-strong)}
+svg text{font-family:inherit}
+.ts{font-size:12px;fill:var(--text-secondary)}
+.th{font-size:14px;font-weight:500;fill:var(--text-primary)}
+@keyframes belt{to{stroke-dashoffset:-24}}
+@media (prefers-reduced-motion:no-preference){.belt{animation:belt 1s linear infinite}}
+#dc.paused .belt{animation-play-state:paused}
+.lg{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;margin:14px 0 0;font-size:14px;color:var(--text-secondary)}
+.lg label{display:flex;align-items:center;gap:6px;cursor:pointer}
+.sw{width:10px;height:10px;border-radius:2px;display:inline-block}
+button{font:inherit;font-size:14px;color:var(--text-primary);background:transparent;border:1px solid var(--border-strong);border-radius:8px;padding:4px 14px;cursor:pointer}
+button:hover{background:var(--surface-1)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+<main>
+<h1>Aldo Montréal distribution center: package flow</h1>
+<p class="sub">Each colored square is a package. Use the toggles to show or hide a flow.</p>
+
+<svg id="dc" viewBox="0 0 680 660" role="img" aria-labelledby="t d">
+<title id="t">Distribution center floor plan with animated package flow</title>
+<desc id="d">Receiving top left, one storage section running from the top down to the bottom, a wide shipping area across the top right, pick and pack right of storage feeding a long conveyor along the right wall, and unused rooms elsewhere.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<rect x="20" y="20" width="640" height="600" rx="8" fill="none" stroke="var(--border-stronger)" stroke-width="1"/>
+
+<g>
+<rect class="box" x="24" y="34" width="134" height="150" rx="6" stroke-width="0.5"/>
+<rect class="box" x="14" y="70" width="12" height="26" stroke-width="0.5"/>
+<rect class="box" x="34" y="50" width="64" height="100" rx="4" stroke-width="0.5" stroke-dasharray="3 3"/>
+<text class="ts" x="66" y="66" text-anchor="middle">Staging</text>
+<circle class="box" cx="130" cy="131" r="10" stroke-width="0.5"/>
+<text class="ts" x="130" y="156" text-anchor="middle">Scan</text>
+<text class="th" x="34" y="176">Receiving</text>
+</g>
+
+<rect x="24" y="196" width="114" height="116" rx="6" fill="none" stroke="var(--border-strong)" stroke-width="0.5" stroke-dasharray="4 3"/>
+<text class="ts" x="81" y="250" text-anchor="middle">Offices</text>
+<text class="ts" x="81" y="268" text-anchor="middle">Not in flow</text>
+
+<rect class="box" x="24" y="322" width="82" height="184" rx="6" stroke-width="0.5" stroke-dasharray="4 3"/>
+<rect class="box" x="14" y="343" width="12" height="24" stroke-width="0.5"/>
+<text class="ts" x="38" y="338">Inspect</text>
+<rect class="box" x="32" y="346" width="70" height="18" rx="3" stroke-width="0.5"/>
+<rect class="box" x="32" y="440" width="70" height="24" rx="3" stroke-width="0.5"/>
+<text class="ts" x="40" y="456">RTV cage</text>
+<text class="th" x="32" y="498">Returns</text>
+
+<g>
+<path d="M160 50H335V104H497V184H359V610H112V316H144V190H160Z" fill="var(--surface-1)" stroke="var(--border-strong)" stroke-width="0.5" stroke-linejoin="round"/>
+<g id="racks"></g>
+<text class="ts" x="194" y="196">Upper racks</text>
+<text class="th" x="200" y="603">Storage</text>
+</g>
+
+<g>
+<path d="M345 30H612V182H503V100H345Z" fill="var(--surface-1)" stroke="var(--border-strong)" stroke-width="0.5" stroke-linejoin="round"/>
+<rect class="box" x="352" y="14" width="26" height="12" stroke-width="0.5"/>
+<rect class="box" x="402" y="14" width="26" height="12" stroke-width="0.5"/>
+<rect class="box" x="450" y="14" width="26" height="12" stroke-width="0.5"/>
+<rect class="box" x="500" y="14" width="26" height="12" stroke-width="0.5"/>
+<rect class="box" x="550" y="14" width="26" height="12" stroke-width="0.5"/>
+<text class="ts" x="463" y="48" text-anchor="middle">Outbound</text>
+<text class="ts" x="515" y="124">Staging</text>
+<g id="stg"></g>
+<text class="th" x="352" y="94">Shipping</text>
+</g>
+
+<g>
+<rect class="box" x="375" y="191" width="240" height="177" rx="6" stroke-width="0.5"/>
+<text class="th" x="383" y="207">Pick and pack</text>
+<g id="pick"></g>
+<text class="ts" x="545" y="205">Pack + label</text>
+<rect class="box" x="545" y="210" width="55" height="24" stroke-width="0.5"/>
+<rect class="box" x="545" y="240" width="55" height="24" stroke-width="0.5"/>
+<rect class="box" x="545" y="270" width="55" height="24" stroke-width="0.5"/>
+</g>
+
+<rect x="24" y="520" width="82" height="92" rx="6" fill="none" stroke="var(--border-strong)" stroke-width="0.5" stroke-dasharray="4 3"/>
+<text class="ts" x="65" y="562" text-anchor="middle">Back room</text>
+<text class="ts" x="65" y="580" text-anchor="middle">Not in flow</text>
+<rect x="380" y="405" width="270" height="205" rx="6" fill="none" stroke="var(--border-strong)" stroke-width="0.5" stroke-dasharray="4 3"/>
+<text class="ts" x="515" y="500" text-anchor="middle">Store equipment</text>
+<text class="ts" x="515" y="518" text-anchor="middle">Stools, fixtures, side rooms</text>
+
+<path d="M621 368L621 64L463 64" fill="none" stroke="var(--border-strong)" stroke-width="10" stroke-linejoin="round" opacity="0.5"/>
+<path class="belt" d="M621 368L621 64L463 64" fill="none" stroke="var(--text-secondary)" stroke-width="1.5" stroke-dasharray="4 8" stroke-linejoin="round"/>
+<text class="ts" x="640" y="386" text-anchor="end">Conveyor belt</text>
+
+<g id="L-in"></g><g id="L-int"></g><g id="L-out"></g><g id="carts"></g>
+</svg>
+
+<div class="lg">
+<label><input type="checkbox" checked data-l="in"><span class="sw" style="background:#1D9E75"></span>Inbound putaway</label>
+<label><input type="checkbox" checked data-l="int"><span class="sw" style="background:#7F77DD"></span>Storage moves</label>
+<label><input type="checkbox" checked data-l="out"><span class="sw" style="background:#D85A30"></span>Pick to ship</label>
+<button id="pp" type="button">Pause</button>
+</div>
+</main>
+
+<script>
+const NS='http://www.w3.org/2000/svg';
+function el(t,a,p){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e;}
+function seg(g,y,list){list.forEach(s=>{if(s[1]-s[0]>=14)el('rect',{class:'box',x:s[0],y:y,width:s[1]-s[0],height:9,'stroke-width':0.5},g);});}
+const racks=document.getElementById('racks');
+[63,91].forEach(y=>seg(racks,y,[[190,258],[282,328]]));
+[117,145,170].forEach(y=>seg(racks,y,[[190,258],[282,368],[392,493]]));
+for(let i=0;i<15;i++){const x0=i<4?150:118;seg(racks,202+27*i,[[x0,168],[186,258],[282,355]]);}
+const pick=document.getElementById('pick');
+for(let i=0;i<9;i++)el('rect',{class:'box',x:392,y:212+14*i,width:113,height:8,'stroke-width':0.5},pick);
+const stg=document.getElementById('stg');
+for(let r=0;r<3;r++)for(let c=0;c<6;c++)el('rect',{class:'box',x:515+14*c,y:132+14*r,width:10,height:10,'stroke-width':0.5},stg);
+const tail='L530 345L530 222L621 222L621 64L463 64L463 26';
+const flows=[
+{l:'in',c:'#1D9E75',d:9,n:[3,3],p:['M20 82L60 82L60 128L177 128L177 491L230 491','M20 82L60 82L60 134L300 134']},
+{l:'int',c:'#7F77DD',d:6,n:[2],p:['M270 440L270 290']},
+{l:'out',c:'#D85A30',d:12,n:[4,3],p:['M270 436L367 436L367 345'+tail,'M300 139L380 139L380 345'+tail]}
+];
+flows.forEach(f=>{const g=document.getElementById('L-'+f.l);
+f.p.forEach((path,pi)=>{
+el('path',{d:path,fill:'none',stroke:f.c,'stroke-width':1.5,'stroke-dasharray':'3 4',opacity:0.45,'marker-end':'url(#arrow)'},g);
+const k=f.n[pi];
+for(let i=0;i<k;i++){
+const b=(-(i*f.d/k)-pi*1.7)+'s';
+const pk=el('g',{},g);
+el('rect',{x:-4.5,y:-4.5,width:9,height:9,rx:1.5,fill:f.c},pk);
+el('animateMotion',{path:path,dur:f.d+'s',begin:b,repeatCount:'indefinite'},pk);
+el('animate',{attributeName:'opacity',values:'0;1;1;0',keyTimes:'0;0.06;0.9;1',dur:f.d+'s',begin:b,repeatCount:'indefinite'},pk);
+}});});
+const cg=document.getElementById('carts');
+[['M270 580L270 215L270 580',10,'0s'],['M177 580L177 215L177 580',13,'-5s']].forEach(c=>{
+const g=el('g',{},cg);
+el('rect',{x:-8,y:-6,width:16,height:12,rx:2,fill:'var(--text-secondary)'},g);
+el('circle',{cx:-5,cy:7,r:2,fill:'var(--text-primary)'},g);
+el('circle',{cx:5,cy:7,r:2,fill:'var(--text-primary)'},g);
+el('animateMotion',{path:c[0],dur:c[1]+'s',begin:c[2],repeatCount:'indefinite'},g);
+});
+document.querySelectorAll('input[data-l]').forEach(i=>i.addEventListener('change',()=>{document.getElementById('L-'+i.dataset.l).style.display=i.checked?'':'none';}));
+const svg=document.getElementById('dc');let paused=false;
+document.getElementById('pp').addEventListener('click',e=>{paused=!paused;if(paused){svg.pauseAnimations();}else{svg.unpauseAnimations();}svg.classList.toggle('paused',paused);e.target.textContent=paused?'Play':'Pause';});
+</script>
+</body>
+</html>
